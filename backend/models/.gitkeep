@@ -1,0 +1,3 @@
+# Mongoose models go here.
+# Each model file should follow the naming convention: <ModelName>.js
+# Example: User.js, Listing.js, Booking.js

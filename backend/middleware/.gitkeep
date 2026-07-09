@@ -1,0 +1,2 @@
+# Custom Express middleware goes here.
+# Examples: authMiddleware.js, errorHandler.js, rateLimiter.js
