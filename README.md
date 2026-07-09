@@ -1,17 +1,22 @@
 # StaySphere – PG & Hostel Management Platform
 
-StaySphere is a full-stack PG & Hostel Management Platform built using the MERN stack. It helps hostel owners efficiently manage tenants, rooms, rent collection, agreements, and maintenance requests through a centralized dashboard.
+StaySphere is a full-stack PG & Hostel Management Platform built using the MERN stack. It helps hostel owners efficiently manage tenants, rooms, rent collection, agreements, and maintenance requests through a centralized dashboard. The platform is designed to simplify hostel administration with secure authentication and an easy-to-use interface.
+
+---
 
 ## Features Completed
 
-- User Authentication (Register & Login)
-- JWT-based Secure Authentication
+- User Registration & Login
+- JWT-based Authentication
+- Role-based Authorization (Admin & Tenant)
 - Owner Dashboard
 - Tenant Management
 - Room & Bed Management
 - Online Rent Collection
 - Digital Agreements
 - Maintenance Requests
+
+---
 
 ## Tech Stack
 
@@ -29,7 +34,7 @@ StaySphere is a full-stack PG & Hostel Management Platform built using the MERN 
 - Mongoose
 
 ### Authentication
-- JWT (JSON Web Token)
+- JSON Web Token (JWT)
 - bcrypt
 
 ---
@@ -59,53 +64,116 @@ StaySphere/
     ├── routes/
     ├── server.js
     ├── package.json
-    └── .env.example
+    ├── .env.example
+    └── .gitignore
+```
 
+---
 
+## Installation
 
-#INSTALLATION
+### Clone the Repository
 
+```bash
+git clone https://github.com/your-username/StaySphere.git
+cd StaySphere
+```
 
+### Backend Setup
 
+```bash
 cd backend
 npm install
 npm run dev
+```
 
-#Backend Runs At:
+The backend server will run at:
 
+```
 http://localhost:5000
+```
 
-#FRONTEND
+### Frontend Setup
 
-Open the frontend using Live Server or any static server.
+Open the `frontend` folder using **Live Server** in VS Code or any static web server.
 
-#AUTHENTICATION
+---
 
-•User Registration
-•User Login
-•JWT Authentication
-•Role-based Authorization (Admin & Tenant)
+## Authentication
 
-#COMPLETED MODULES
+- User Registration
+- User Login
+- Secure JWT Authentication
+- Role-based Access Control
 
-•Owner Dashboard
-•Tenant Management
-•Room & Bed Management
-•Rent Management
-•Digital Agreements
-•Maintenance Requests
+---
 
-#UPCOMING FEATURES
+## Modules Implemented
 
-•Visitor Management
-•Expense Tracking
-•Attendance & Check-In
-Notice Board
+### Owner Dashboard
+- Live statistics
+- Dashboard summary
+- Dynamic data display
 
-#AUTHOR
+### Tenant Management
+- Add Tenant
+- Edit Tenant
+- Delete Tenant
+- Search & Filter
 
-Vasu Dev
+### Room & Bed Management
+- Create Rooms
+- Manage Beds
+- Assign/Unassign Tenants
+- Track Occupancy
 
+### Online Rent Collection
+- Create Rent Records
+- Payment History
+- Pending / Paid / Overdue Status
+- Dashboard Integration
 
+### Digital Agreements
+- Create Agreements
+- Edit Agreements
+- Search & Filter
+- Active / Expired Status
 
+### Maintenance Requests
+- Raise Maintenance Requests
+- Track Request Status
+- Admin Resolution
+- Dashboard Statistics
 
+---
+
+## Upcoming Features
+
+- Visitor Management
+- Expense Tracking
+- Attendance & Check-In
+- Notice Board
+
+---
+
+## Future Enhancements
+
+- Tenant Dashboard
+- Email Notifications
+- Online Payment Gateway
+- Reports & Analytics
+- Mobile Responsive Improvements
+
+---
+
+## Author
+
+**Vasu Dev**
+
+B.Tech – Computer Science & Engineering (AI & ML)
+
+---
+
+## License
+
+This project is developed for educational and academic purposes.
