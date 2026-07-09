@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere – View your rental agreement." />
+  <title>My Agreement – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/maintenance.css" />
+  <style>
+    :root { --clr-primary: #00d4ff; --clr-primary-light: rgba(0,212,255,0.12); --clr-primary-glow: rgba(0,212,255,0.40); }
+    .role-badge.tenant { background: rgba(0,212,255,0.12); color: #00d4ff; border: 1px solid rgba(0,212,255,0.25); }
+
+    /* Agreement card layout */
+    .agreement-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .agreement-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--clr-primary), #6c63ff);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .agreement-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .agreement-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .agreement-number {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--clr-text);
+    }
+    .agreement-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .ag-field-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--clr-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.3rem;
+    }
+    .ag-field-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--clr-text);
+    }
+    .ag-block {
+      grid-column: span 2;
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+    }
+    .doc-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: var(--clr-primary-light);
+      color: var(--clr-primary);
+      border: 1px solid rgba(0,212,255,0.25);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background var(--transition);
+      margin-top: 0.75rem;
+      width: fit-content;
+    }
+    .doc-link:hover { background: rgba(0,212,255,0.22); }
+
+    .no-agreement {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--clr-muted);
+    }
+    .no-agreement .icon { font-size: 3rem; margin-bottom: 1rem; }
+    .no-agreement h2 { font-size: 1.1rem; font-weight: 600; color: var(--clr-text); margin-bottom: 0.5rem; }
+    .no-agreement p  { font-size: 0.875rem; }
+
+    @media (max-width: 600px) {
+      .agreement-grid { grid-template-columns: 1fr; }
+      .ag-block { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════ TENANT SIDEBAR ══════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Tenant navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">My Space</span>
+      <a href="tenant-dashboard.html" class="nav-item" id="nav-home"><span class="nav-icon">🏠</span> My Dashboard</a>
+      <a href="tenant-maintenance.html" class="nav-item" id="nav-maintenance"><span class="nav-icon">🔧</span> Maintenance</a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="tenant-rent.html" class="nav-item" id="nav-rent"><span class="nav-icon">💳</span> Rent</a>
+      <a href="tenant-agreement.html" class="nav-item active" id="nav-agreements"><span class="nav-icon">📜</span> My Agreement</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN ════════════════════════════════════════════ -->
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="tenant-name">Tenant</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge tenant">Tenant</span>
+        <div class="avatar" id="tenant-initial" aria-label="Tenant avatar">T</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <h1 class="page-title">My Agreement</h1>
+      <p class="page-subtitle">Your rental agreement(s) and contract details.</p>
+
+      <!-- Content injected by tenant-agreement.js -->
+      <div id="agreements-container">
+        <!-- Loading state -->
+        <div id="loading-state" style="text-align:center;padding:3rem;color:var(--clr-muted);">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">📜</div>
+          <div>Loading your agreement…</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span id="toast-icon">ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <script src="js/tenant-auth.js"></script>
+  <script src="js/tenant-agreement.js"></script>
+</body>
+</html>

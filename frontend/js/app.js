@@ -24,6 +24,9 @@ const API_BASE = 'http://localhost:5000/api';
     const json = await res.json();
     const user = json.data;
 
+    // ── Choose the correct dashboard URL based on role ────────────────
+    const dashboardUrl = user?.role === 'Tenant' ? 'tenant-dashboard.html' : 'dashboard.html';
+
     // ── Swap nav links ────────────────────────────────────────
     const nav = document.querySelector('nav');
     if (!nav) return;
@@ -33,7 +36,7 @@ const API_BASE = 'http://localhost:5000/api';
 
     // Add dashboard + logout links
     const dashLink = document.createElement('a');
-    dashLink.href      = 'dashboard.html';
+    dashLink.href        = dashboardUrl;
     dashLink.textContent = '📊 Dashboard';
     dashLink.style.cssText = 'color:var(--clr-accent);font-weight:600;';
 
@@ -51,11 +54,14 @@ const API_BASE = 'http://localhost:5000/api';
     nav.appendChild(dashLink);
     nav.appendChild(logoutLink);
 
-    // Show a greeting in the hero if element exists
+    // Show a role-aware greeting in the hero if element exists
     const heroP = document.querySelector('.hero-content p');
     if (heroP) {
       const firstName = user.fullName?.split(' ')[0] || 'there';
-      heroP.textContent = `Welcome back, ${firstName}! Head to your dashboard to manage your hostel.`;
+      const context   = user?.role === 'Tenant'
+        ? 'Head to your portal to manage your stay.'
+        : 'Head to your dashboard to manage your hostel.';
+      heroP.textContent = `Welcome back, ${firstName}! ${context}`;
     }
 
   } catch (_) {

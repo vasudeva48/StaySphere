@@ -68,8 +68,10 @@ const statMap = [
   { id: 'stat-agreements',  key: 'activeAgreements',        label: 'Active Agreements',        icon: '📜', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
   { id: 'stat-maintenance-open', key: 'openMaintenanceRequests', label: 'Open Maintenance Requests',  icon: '🔧', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
   { id: 'stat-maintenance-res',  key: 'resolvedMaintenanceRequests', label: 'Resolved Maintenance Requests',icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',  rupees: false },
-  { id: 'stat-visitors',    key: 'todaysVisitorCheckIns',   label: "Today's Check-ins",        icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
-  { id: 'stat-expenses',    key: 'monthlyExpenses',         label: 'Monthly Expenses (₹)',     icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },
+  { id: 'stat-visitors',         key: 'todaysVisitorCheckIns',  label: "Today's Visitors",          icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
+  { id: 'stat-visitors-in',      key: 'currentlyCheckedIn',     label: 'Currently Checked In',      icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
+  { id: 'stat-visitors-out',     key: 'checkedOutToday',        label: 'Checked Out Today',         icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false },
+  { id: 'stat-expenses',         key: 'monthlyExpenses',        label: 'Monthly Expenses (₹)',      icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },
 ];
 
 
@@ -123,8 +125,9 @@ async function fetchStats() {
     }
 
     populateStats(json.data);
-    loadRecentPendingRent(); // Load dynamic pending list too
-    loadRecentMaintenanceRequests(); // Load dynamic maintenance requests list
+    loadRecentPendingRent();
+    loadRecentMaintenanceRequests();
+    loadRecentVisitors();
   } catch (err) {
     showToast(err.message || 'Could not reach server', true);
     // Show dashes on failure
@@ -229,6 +232,49 @@ async function loadRecentMaintenanceRequests() {
   } catch (err) {
     console.error('Error loading maintenance list on dashboard:', err);
     listEl.innerHTML = '<div style="text-align:center; color:var(--clr-danger); font-size:0.85rem; padding:1rem 0;">Could not load maintenance requests</div>';
+  }
+}
+
+// ── Fetch and display today's recent visitor activity ────────────────────
+async function loadRecentVisitors() {
+  const listEl = document.getElementById('todays-visitors-list');
+  if (!listEl) return;
+
+  try {
+    const res  = await fetch(`${API_BASE}/visitors/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message);
+
+    const visitors = json.data?.recent || [];
+    if (!visitors.length) {
+      listEl.innerHTML = '<div style="text-align:center; color:var(--clr-muted); font-size:0.85rem; padding:1.2rem 0;">No visitors registered today.</div>';
+      return;
+    }
+
+    const statusColors = { 'Checked In': '#22c55e', 'Checked Out': '#a855f7', 'Registered': '#f59e0b' };
+    listEl.innerHTML = visitors.map(v => {
+      const col = statusColors[v.status] || '#fff';
+      const time = v.checkInTime ? new Date(v.checkInTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—';
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.8rem; background:var(--clr-surface-2); border-radius:var(--radius-sm); border:1px solid var(--clr-border);">
+          <div>
+            <div style="font-weight:600; font-size:0.875rem; color:var(--clr-text);">${v.visitorName}</div>
+            <div style="font-size:0.75rem; color:var(--clr-muted); margin-top:0.15rem;">
+              Visiting ${v.tenantName || '—'} · Room ${v.roomNumber || '—'}
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:0.7rem; font-weight:700; color:${col}; border:1px solid ${col}40; background:${col}10; padding:0.15rem 0.4rem; border-radius:10px; display:inline-block;">${v.status}</span>
+            <div style="font-size:0.68rem; color:var(--clr-muted); margin-top:0.25rem;">In: ${time}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('Error loading visitors:', err);
+    listEl.innerHTML = '<div style="text-align:center; color:var(--clr-danger); font-size:0.85rem; padding:1rem 0;">Could not load visitor data</div>';
   }
 }
 

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere – Manage visitors, log check-in/out, and view visitor logs." />
+  <title>Visitor Management – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/visitors.css" />
+</head>
+<body>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Main</span>
+      <a href="dashboard.html" class="nav-item" id="nav-dashboard"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="tenants.html"   class="nav-item" id="nav-tenants"><span class="nav-icon">👥</span> Tenants</a>
+      <a href="rooms.html"     class="nav-item" id="nav-rooms"><span class="nav-icon">🛏️</span> Rooms</a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="rent.html" class="nav-item" id="nav-rent"><span class="nav-icon">💳</span> Rent</a>
+      <a href="#" class="nav-item" id="nav-expenses"><span class="nav-icon">📊</span> Expenses</a>
+      <a href="agreements.html" class="nav-item" id="nav-agreements"><span class="nav-icon">📜</span> Agreements</a>
+
+      <span class="nav-section-label">Operations</span>
+      <a href="maintenance.html" class="nav-item" id="nav-maintenance"><span class="nav-icon">🔧</span> Maintenance</a>
+      <a href="visitors.html" class="nav-item active" id="nav-visitors"><span class="nav-icon">🚪</span> Visitors</a>
+      <a href="#" class="nav-item" id="nav-notices"><span class="nav-icon">📋</span> Notices</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN ════════════════════════════════════════════ -->
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="admin-name">Admin</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge">Admin</span>
+        <div class="avatar" id="admin-initial" aria-label="Admin avatar">A</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+      <h1 class="page-title">Visitor Management</h1>
+      <p class="page-subtitle">Track visitor logs, record check-ins/outs, and maintain host records.</p>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip">🚪 Today's Check-ins <strong id="sc-total">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-success)">✅ Currently Checked In <strong id="sc-checkedin">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-primary)">🏃 Checked Out Today <strong id="sc-checkedout">—</strong></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search visitor name, tenant, room or phone..." autocomplete="off" />
+        </div>
+        <select id="status-filter" class="filter-select" aria-label="Filter by status">
+          <option value="All">All Statuses</option>
+          <option value="Registered">Registered</option>
+          <option value="Checked In">Checked In</option>
+          <option value="Checked Out">Checked Out</option>
+        </select>
+        <button id="btn-add-visitor" class="btn btn-primary" aria-label="Register new visitor">➕ Add Visitor</button>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card">
+        <div class="table-header-bar">
+          <span class="table-title">🚪 Visitor Logs</span>
+          <span class="record-count-badge" id="record-count">0 logs</span>
+        </div>
+        <div class="table-wrap">
+          <table id="visitors-table" aria-label="Visitors list">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Visitor Details</th>
+                <th>Host Tenant &amp; Room</th>
+                <th>Relationship &amp; Purpose</th>
+                <th>Check-In / Out Times</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="visitors-table-body">
+              <!-- Rendered dynamically by visitors.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="empty-state" class="empty-state" style="display:none;">
+          <div class="empty-icon">🚪</div>
+          <div class="empty-title">No visitor records found</div>
+          <div class="empty-sub">Click "Add Visitor" to register a new visitor log.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════ MODALS ═══════════════════════════════════════════ -->
+
+  <!-- Add/Edit Visitor Modal -->
+  <div class="modal-backdrop" id="visitor-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="visitor-modal-title">Register Visitor</h2>
+        <button class="modal-close" id="visitor-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="visitor-form" onsubmit="event.preventDefault();">
+          <input type="hidden" id="visitor-id" />
+
+          <!-- Form row for Name & Phone -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-visitorName">Visitor Name *</label>
+              <input type="text" id="f-visitorName" class="form-control" placeholder="e.g. John Doe" required />
+            </div>
+            <div class="form-group">
+              <label for="f-phoneNumber">Phone Number *</label>
+              <input type="tel" id="f-phoneNumber" class="form-control" placeholder="e.g. +91 9876543210" required />
+            </div>
+          </div>
+
+          <!-- Tenant Selection & Auto-fill Room -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-tenant">Host Tenant *</label>
+              <select id="f-tenant" class="form-select" required>
+                <option value="">— Select Tenant —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-roomNumber">Assigned Room</label>
+              <input type="text" id="f-roomNumber" class="form-control" placeholder="Select tenant first" readonly />
+            </div>
+          </div>
+
+          <!-- Relationship & Purpose -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-relationship">Relationship *</label>
+              <input type="text" id="f-relationship" class="form-control" placeholder="e.g. Parent, Friend, Brother" required />
+            </div>
+            <div class="form-group">
+              <label for="f-purpose">Purpose of Visit *</label>
+              <input type="text" id="f-purpose" class="form-control" placeholder="e.g. Deliver food, Weekend stay" required />
+            </div>
+          </div>
+
+          <!-- ID Proof Type & Number -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-idProofType">ID Proof Type</label>
+              <select id="f-idProofType" class="form-select">
+                <option value="">— Select ID Type —</option>
+                <option value="Aadhaar">Aadhaar</option>
+                <option value="PAN">PAN</option>
+                <option value="Passport">Passport</option>
+                <option value="Driving License">Driving License</option>
+                <option value="Voter ID">Voter ID</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-idProofNumber">ID Proof Number</label>
+              <input type="text" id="f-idProofNumber" class="form-control" placeholder="e.g. ABCD1234E" />
+            </div>
+          </div>
+
+          <!-- Remarks -->
+          <div class="form-group">
+            <label for="f-remarks">Remarks</label>
+            <textarea id="f-remarks" class="form-textarea" rows="2" placeholder="Additional notes..."></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="visitor-modal-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="visitor-modal-submit">Save Visitor</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-backdrop" id="delete-modal">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Visitor Record</h2>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="delete-visitor-id" />
+        <p id="delete-msg" style="font-size:0.9rem; line-height:1.5; color:var(--clr-text); margin-bottom:1.5rem;"></p>
+        <div class="modal-footer" style="margin-top:0;">
+          <button class="btn btn-ghost" id="delete-cancel">Cancel</button>
+          <button class="btn btn-danger" id="delete-confirm">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span id="toast-icon">ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/visitors.js"></script>
+</body>
+</html>

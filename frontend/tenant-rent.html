@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere – View your rent payment history." />
+  <title>My Rent – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/maintenance.css" />
+  <style>
+    :root { --clr-primary: #00d4ff; --clr-primary-light: rgba(0,212,255,0.12); --clr-primary-glow: rgba(0,212,255,0.40); }
+    .role-badge.tenant { background: rgba(0,212,255,0.12); color: #00d4ff; border: 1px solid rgba(0,212,255,0.25); }
+
+    /* Rent-specific status colours */
+    .status-paid     { background: rgba(34,197,94,0.12);  color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+    .status-overdue  { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+    .status-pending  { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+
+    .amount-cell { font-weight: 700; font-size: 1rem; }
+    .amount-paid    { color: #22c55e; }
+    .amount-overdue { color: #ef4444; }
+    .amount-pending { color: #f59e0b; }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════ TENANT SIDEBAR ══════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Tenant navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">My Space</span>
+      <a href="tenant-dashboard.html" class="nav-item" id="nav-home"><span class="nav-icon">🏠</span> My Dashboard</a>
+      <a href="tenant-maintenance.html" class="nav-item" id="nav-maintenance"><span class="nav-icon">🔧</span> Maintenance</a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="tenant-rent.html" class="nav-item active" id="nav-rent"><span class="nav-icon">💳</span> Rent</a>
+      <a href="tenant-agreement.html" class="nav-item" id="nav-agreements"><span class="nav-icon">📜</span> My Agreement</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN ════════════════════════════════════════════ -->
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="tenant-name">Tenant</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge tenant">Tenant</span>
+        <div class="avatar" id="tenant-initial" aria-label="Tenant avatar">T</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <h1 class="page-title">My Rent</h1>
+      <p class="page-subtitle">View your rent invoices and payment history.</p>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip">💳 Total Records <strong id="sc-total">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-warning)">⏳ Pending <strong id="sc-pending">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-danger)">⚠️ Overdue <strong id="sc-overdue">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-success)">✅ Paid <strong id="sc-paid">—</strong></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search by month…" autocomplete="off" />
+        </div>
+        <select id="status-filter" class="filter-select" aria-label="Filter by status">
+          <option value="All">All Statuses</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card">
+        <div class="table-header-bar">
+          <span class="table-title">💳 My Rent Payment History</span>
+          <span class="record-count-badge" id="record-count">0 records</span>
+        </div>
+        <div class="table-wrap">
+          <table id="rent-table" aria-label="My rent payment history">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Rent Month</th>
+                <th>Amount</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Paid On</th>
+                <th>Method</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="rent-table-body"></tbody>
+          </table>
+        </div>
+        <div id="empty-state" class="empty-state" style="display:none;">
+          <div class="empty-icon">💳</div>
+          <div class="empty-title">No rent records found</div>
+          <div class="empty-sub">Your rent records will appear here once the owner creates them.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span id="toast-icon">ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <script src="js/tenant-auth.js"></script>
+  <script src="js/tenant-rent.js"></script>
+</body>
+</html>

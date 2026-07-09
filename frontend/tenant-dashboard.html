@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere Tenant Dashboard – view your room, rent, and maintenance requests." />
+  <title>My Dashboard – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <style>
+    /* ── Tenant-specific accent overrides ─────────────────────────────── */
+    :root {
+      --clr-tenant:       #00d4ff;
+      --clr-tenant-light: rgba(0, 212, 255, 0.12);
+      --clr-tenant-glow:  rgba(0, 212, 255, 0.40);
+    }
+
+    .role-badge.tenant {
+      background: var(--clr-tenant-light);
+      color: var(--clr-tenant);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+    }
+
+    /* ── Info Cards ────────────────────────────────────────────────────── */
+    .info-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .info-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius);
+      padding: 1.4rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .info-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--clr-tenant));
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .info-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .info-card-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+      background: var(--card-icon-bg, var(--clr-tenant-light));
+    }
+
+    .info-card-label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--clr-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .info-card-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--clr-text);
+      line-height: 1.1;
+    }
+
+    .info-card-sub {
+      font-size: 0.78rem;
+      color: var(--clr-muted);
+    }
+
+    /* ── Welcome Banner ────────────────────────────────────────────────── */
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(0,212,255,0.10) 0%, rgba(108,99,255,0.10) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.20);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .welcome-banner-icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .welcome-banner h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .welcome-banner p {
+      font-size: 0.875rem;
+      color: var(--clr-muted);
+    }
+
+    /* ── Notice Box ────────────────────────────────────────────────────── */
+    .notice-box {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .notice-box-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .notice-box-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .notice-box-body {
+      font-size: 0.875rem;
+      color: var(--clr-muted);
+      line-height: 1.6;
+    }
+
+    /* ── Tenant Quick Actions ──────────────────────────────────────────── */
+    .tenant-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Status pill ───────────────────────────────────────────────────── */
+    .status-pill {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .status-pill.active   { background: rgba(34,197,94,0.12);  color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+    .status-pill.pending  { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+    .status-pill.inactive { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+
+    @media (max-width: 600px) {
+      .welcome-banner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Sidebar overlay (mobile) ─────────────────────────── -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  SIDEBAR                                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Tenant navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">My Space</span>
+
+      <a href="tenant-dashboard.html" class="nav-item active" id="nav-home">
+        <span class="nav-icon">🏠</span> My Dashboard
+      </a>
+      <a href="tenant-maintenance.html" class="nav-item" id="nav-maintenance">
+        <span class="nav-icon">🔧</span> Maintenance
+      </a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="tenant-rent.html" class="nav-item" id="nav-rent">
+        <span class="nav-icon">💳</span> Rent
+      </a>
+      <a href="tenant-agreement.html" class="nav-item" id="nav-agreements">
+        <span class="nav-icon">📜</span> My Agreement
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  MAIN                                                  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="tenant-name">Tenant</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge tenant">Tenant</span>
+        <div class="avatar" id="tenant-initial" aria-label="Tenant avatar">T</div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="content">
+
+      <h1 class="page-title">My Dashboard</h1>
+      <p class="page-subtitle">Welcome to your StaySphere tenant portal.</p>
+
+      <!-- ── Welcome Banner ─────────────────────────────────── -->
+      <div class="welcome-banner">
+        <div class="welcome-banner-icon">🏡</div>
+        <div>
+          <h2>You're all set!</h2>
+          <p>
+            You're logged in as a <strong style="color:var(--clr-tenant)">Tenant</strong>.
+            Use the sidebar to view your rent history, agreements, and raise maintenance requests.
+          </p>
+        </div>
+      </div>
+
+      <!-- ── Summary Cards ──────────────────────────────────── -->
+      <div class="info-cards">
+
+        <div class="info-card" style="--card-accent:#00d4ff; --card-icon-bg:rgba(0,212,255,0.12);">
+          <div class="info-card-icon">🛏️</div>
+          <div class="info-card-label">My Room</div>
+          <div class="info-card-value" id="card-room">—</div>
+          <div class="info-card-sub" id="card-bed">Bed: —</div>
+        </div>
+
+        <div class="info-card" style="--card-accent:#22c55e; --card-icon-bg:rgba(34,197,94,0.12);">
+          <div class="info-card-icon">📜</div>
+          <div class="info-card-label">Agreement</div>
+          <div class="info-card-value" id="card-agreement">—</div>
+          <div class="info-card-sub" id="card-agreement-dates">—</div>
+        </div>
+
+        <div class="info-card" style="--card-accent:#f59e0b; --card-icon-bg:rgba(245,158,11,0.12);">
+          <div class="info-card-icon">💳</div>
+          <div class="info-card-label">Rent Status</div>
+          <div class="info-card-value" id="card-rent">—</div>
+          <div class="info-card-sub" id="card-rent-sub">This month</div>
+        </div>
+
+        <div class="info-card" style="--card-accent:#a855f7; --card-icon-bg:rgba(168,85,247,0.12);">
+          <div class="info-card-icon">🔧</div>
+          <div class="info-card-label">Open Requests</div>
+          <div class="info-card-value" id="card-maintenance">—</div>
+          <div class="info-card-sub">Maintenance tickets</div>
+        </div>
+
+      </div>
+
+      <!-- ── Quick Actions ──────────────────────────────────── -->
+      <div class="section-card" style="margin-bottom:2rem;">
+        <div class="section-card-header">
+          <h2 class="section-card-title">⚡ Quick Actions</h2>
+        </div>
+        <div class="tenant-actions">
+          <a href="tenant-maintenance.html" class="action-btn" id="action-maintenance">
+            <span class="action-icon">🔧</span> Raise Request
+          </a>
+          <a href="tenant-rent.html" class="action-btn" id="action-rent">
+            <span class="action-icon">💳</span> View Rent
+          </a>
+          <a href="tenant-agreement.html" class="action-btn" id="action-agreement">
+            <span class="action-icon">📜</span> My Agreement
+          </a>
+        </div>
+      </div>
+
+      <!-- ── Notice Board ───────────────────────────────────── -->
+      <div class="notice-box">
+        <div class="notice-box-header">
+          <span style="font-size:1.3rem;">📋</span>
+          <h2 class="notice-box-title">Notice Board</h2>
+          <span class="placeholder-badge">Coming Soon</span>
+        </div>
+        <div class="notice-box-body">
+          Hostel notices and announcements from your owner will appear here.
+          Check back soon!
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /.main -->
+
+  <!-- ── Toast ─────────────────────────────────────────────── -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span>ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <script src="js/tenant-auth.js"></script>
+  <script src="js/tenant-dashboard.js"></script>
+</body>
+</html>

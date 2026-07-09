@@ -3,11 +3,17 @@
    
    Auth-aware early check:
    If ss_token exists in localStorage we verify it against GET /api/auth/me.
-   - Valid token  → redirect to dashboard.html (always — prevents silent loop)
+   - Valid token + Admin  → redirect to dashboard.html
+   - Valid token + Tenant → redirect to tenant-dashboard.html
    - Invalid/expired token → clear localStorage and show the login form
 ───────────────────────────────────────────────────────────────────────── */
 
 const API_BASE = 'http://localhost:5000/api';
+
+// ── Helper: redirect to the correct dashboard based on role ──────────────────
+function redirectToDashboard(role) {
+  window.location.href = role === 'Tenant' ? 'tenant-dashboard.html' : 'dashboard.html';
+}
 
 // ── Async token validation (runs before showing form) ────────────────────────
 (async () => {
@@ -20,8 +26,9 @@ const API_BASE = 'http://localhost:5000/api';
     });
 
     if (res.ok) {
-      // Token is still valid → go to dashboard
-      window.location.href = 'dashboard.html';
+      // Token is still valid → go to role-appropriate dashboard
+      const json = await res.json();
+      redirectToDashboard(json.data?.role);
       return;
     }
     // Token invalid / expired → clear stale data and show the form
@@ -140,9 +147,9 @@ form.addEventListener('submit', async (e) => {
 
     showSuccess('Login successful! Redirecting…');
 
-    // ── All roles go to dashboard – dashboard handles role display ──
+    // ── Route to role-appropriate dashboard ──────────────────────────────
     setTimeout(() => {
-      window.location.href = 'dashboard.html';
+      redirectToDashboard(json.data?.role);
     }, 900);
 
   } catch (err) {

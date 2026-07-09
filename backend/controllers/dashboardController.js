@@ -3,6 +3,7 @@ const Room   = require('../models/Room');
 const Rent   = require('../models/Rent');
 const Agreement = require('../models/Agreement');
 const MaintenanceRequest = require('../models/MaintenanceRequest');
+const Visitor = require('../models/Visitor');
 
 /**
  * @desc    Get Owner Dashboard summary statistics
@@ -51,9 +52,14 @@ const getDashboardStats = async (req, res) => {
       MaintenanceRequest.countDocuments({ status: 'Resolved' })
     ]);
 
-    // ── Visitors ──────────────────────────────────────────────
-    // TODO: replace with Visitor.countDocuments({ checkInDate: today })
-    const todaysVisitorCheckIns = 0;
+    // ── Visitors ───────────────────────────────────────────────
+    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    const todayEnd   = new Date(); todayEnd.setHours(23, 59, 59, 999);
+    const [todaysVisitorCheckIns, currentlyCheckedIn, checkedOutToday] = await Promise.all([
+      Visitor.countDocuments({ createdAt:    { $gte: todayStart, $lte: todayEnd } }),
+      Visitor.countDocuments({ status: 'Checked In' }),
+      Visitor.countDocuments({ status: 'Checked Out', checkOutTime: { $gte: todayStart, $lte: todayEnd } }),
+    ]);
 
     // ── Expenses ──────────────────────────────────────────────
     // TODO: replace with Expense aggregate sum for current month
@@ -72,6 +78,8 @@ const getDashboardStats = async (req, res) => {
         openMaintenanceRequests,
         resolvedMaintenanceRequests,
         todaysVisitorCheckIns,
+        currentlyCheckedIn,
+        checkedOutToday,
         monthlyExpenses,
         admin: {
           name:  req.user.fullName,
