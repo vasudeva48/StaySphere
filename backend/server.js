@@ -9,6 +9,8 @@ const authRoutes      = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const tenantRoutes    = require('./routes/tenantRoutes');
 const roomRoutes      = require('./routes/roomRoutes');
+const rentRoutes      = require('./routes/rentRoutes');
+
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
@@ -27,6 +29,7 @@ app.use('/api/auth',      authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/tenants',   tenantRoutes);
 app.use('/api/rooms',     roomRoutes);
+app.use('/api/rent',      rentRoutes);
 
 // ── Start Server ───────────────────────────────────────────
 app.listen(PORT, () => {

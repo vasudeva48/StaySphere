@@ -1,5 +1,6 @@
 const Tenant = require('../models/Tenant');
 const Room   = require('../models/Room');
+const Rent   = require('../models/Rent');
 
 /**
  * @desc    Get Owner Dashboard summary statistics
@@ -8,6 +9,9 @@ const Room   = require('../models/Room');
  */
 const getDashboardStats = async (req, res) => {
   try {
+    // Refresh overdue rent statuses first
+    await Rent.refreshOverdue();
+
     // ── Tenants ───────────────────────────────────────────────
     const totalTenants = await Tenant.countDocuments({ status: 'Active' });
 
@@ -19,8 +23,19 @@ const getDashboardStats = async (req, res) => {
     ]);
 
     // ── Rent ──────────────────────────────────────────────────
-    // TODO: replace with RentPayment.countDocuments({ status: 'Pending' })
-    const pendingRentPayments = 0;
+    const now        = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+    const [pendingRentPayments, paidThisMonthAgg] = await Promise.all([
+      Rent.countDocuments({ status: { $in: ['Pending', 'Overdue'] } }),
+      Rent.aggregate([
+        { $match: { status: 'Paid', paymentDate: { $gte: monthStart, $lte: monthEnd } } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]),
+    ]);
+
+    const monthlyRentCollected = paidThisMonthAgg[0]?.total || 0;
 
     // ── Maintenance ───────────────────────────────────────────
     // TODO: replace with MaintenanceRequest.countDocuments({ status: 'Open' })
@@ -42,6 +57,7 @@ const getDashboardStats = async (req, res) => {
         occupiedRooms,
         vacantRooms,
         pendingRentPayments,
+        monthlyRentCollected,
         openMaintenanceRequests,
         todaysVisitorCheckIns,
         monthlyExpenses,

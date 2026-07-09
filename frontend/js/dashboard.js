@@ -59,15 +59,17 @@ function showToast(msg, isError = false) {
 
 // ── Stat cards mapping ────────────────────────────────────────────────
 const statMap = [
-  { id: 'stat-tenants',     key: 'totalTenants',           label: 'Total Tenants',           icon: '👥', accent: '#6c63ff', iconBg: 'rgba(108,99,255,0.12)' },
-  { id: 'stat-rooms',       key: 'totalRooms',             label: 'Total Rooms',             icon: '🏠', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)'   },
-  { id: 'stat-occupied',    key: 'occupiedRooms',          label: 'Occupied Rooms',          icon: '🔒', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)'  },
-  { id: 'stat-vacant',      key: 'vacantRooms',            label: 'Vacant Rooms',            icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)'   },
-  { id: 'stat-rent',        key: 'pendingRentPayments',    label: 'Pending Rent',            icon: '💳', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)'   },
-  { id: 'stat-maintenance', key: 'openMaintenanceRequests',label: 'Maintenance Requests',    icon: '🔧', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)'  },
-  { id: 'stat-visitors',    key: 'todaysVisitorCheckIns',  label: "Today's Check-ins",       icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)'   },
-  { id: 'stat-expenses',    key: 'monthlyExpenses',        label: 'Monthly Expenses (₹)',    icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)'  },
+  { id: 'stat-tenants',     key: 'totalTenants',            label: 'Total Tenants',            icon: '👥', accent: '#6c63ff', iconBg: 'rgba(108,99,255,0.12)', rupees: false },
+  { id: 'stat-rooms',       key: 'totalRooms',              label: 'Total Rooms',              icon: '🏠', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
+  { id: 'stat-occupied',    key: 'occupiedRooms',           label: 'Occupied Rooms',           icon: '🔒', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
+  { id: 'stat-vacant',      key: 'vacantRooms',             label: 'Vacant Rooms',             icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
+  { id: 'stat-rent-pend',   key: 'pendingRentPayments',     label: 'Pending / Overdue Rent',   icon: '💳', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: false },
+  { id: 'stat-rent-coll',   key: 'monthlyRentCollected',    label: 'Rent Collected (Month)',    icon: '💰', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: true  },
+  { id: 'stat-maintenance', key: 'openMaintenanceRequests', label: 'Maintenance Requests',     icon: '🔧', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
+  { id: 'stat-visitors',    key: 'todaysVisitorCheckIns',   label: "Today's Check-ins",        icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
+  { id: 'stat-expenses',    key: 'monthlyExpenses',         label: 'Monthly Expenses (₹)',     icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },
 ];
+
 
 // ── Render skeleton cards ──────────────────────────────────────────────
 function renderSkeletonCards() {
@@ -88,8 +90,8 @@ function populateStats(data) {
       .querySelectorAll('.stat-card')[statMap.indexOf(s)];
     if (!card) return;
     const valueEl = card.querySelector('.stat-value');
-    const raw = data[s.key];
-    valueEl.textContent = s.key === 'monthlyExpenses'
+    const raw = data[s.key] ?? 0;
+    valueEl.textContent = s.rupees
       ? `₹${Number(raw).toLocaleString('en-IN')}`
       : raw;
     valueEl.classList.remove('loading');
@@ -119,6 +121,7 @@ async function fetchStats() {
     }
 
     populateStats(json.data);
+    loadRecentPendingRent(); // Load dynamic pending list too
   } catch (err) {
     showToast(err.message || 'Could not reach server', true);
     // Show dashes on failure
@@ -126,6 +129,47 @@ async function fetchStats() {
       el.textContent = '—';
       el.classList.remove('loading');
     });
+  }
+}
+
+// ── Fetch and display recent pending rent records ──────────────────────
+async function loadRecentPendingRent() {
+  const listEl = document.getElementById('pending-rent-list');
+  if (!listEl) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/rent?status=Pending`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message);
+
+    const records = (json.data || []).slice(0, 3); // Take top 3
+    if (!records.length) {
+      listEl.innerHTML = '<div style="text-align:center; color:var(--clr-muted); font-size:0.85rem; padding:1.5rem 0;">🎉 All rent payments are up to date!</div>';
+      return;
+    }
+
+    listEl.innerHTML = records.map(r => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.8rem; background:var(--clr-surface-2); border-radius:var(--radius-sm); border:1px solid var(--clr-border);">
+        <div>
+          <div style="font-weight:600; font-size:0.875rem; color:var(--clr-text);">${r.tenantName || 'Tenant'}</div>
+          <div style="font-size:0.75rem; color:var(--clr-muted); margin-top:0.15rem;">
+            ${r.roomNumber ? 'Room ' + r.roomNumber : 'No Room'} · ${r.rentMonth}
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:700; color:var(--clr-danger); font-size:0.875rem;">₹${(r.amount || 0).toLocaleString('en-IN')}</div>
+          <div style="font-size:0.7rem; color:var(--clr-muted); margin-top:0.15rem;">
+            Due: ${r.dueDate ? new Date(r.dueDate).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit'}) : '—'}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error('Error loading pending rent list on dashboard:', err);
+    listEl.innerHTML = '<div style="text-align:center; color:var(--clr-danger); font-size:0.85rem; padding:1rem 0;">Could not load pending rent records</div>';
   }
 }
 

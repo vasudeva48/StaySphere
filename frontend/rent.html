@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere – Manage rent payments and view payment history." />
+  <title>Rent Management – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/rent.css" />
+</head>
+<body>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Main</span>
+      <a href="dashboard.html" class="nav-item" id="nav-dashboard"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="tenants.html"   class="nav-item" id="nav-tenants"><span class="nav-icon">👥</span> Tenants</a>
+      <a href="rooms.html"     class="nav-item" id="nav-rooms"><span class="nav-icon">🛏️</span> Rooms</a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="rent.html" class="nav-item active" id="nav-rent"><span class="nav-icon">💳</span> Rent</a>
+      <a href="#" class="nav-item" id="nav-expenses"><span class="nav-icon">📊</span> Expenses</a>
+
+      <span class="nav-section-label">Operations</span>
+      <a href="#" class="nav-item" id="nav-maintenance"><span class="nav-icon">🔧</span> Maintenance</a>
+      <a href="#" class="nav-item" id="nav-visitors"><span class="nav-icon">🚪</span> Visitors</a>
+      <a href="#" class="nav-item" id="nav-notices"><span class="nav-icon">📋</span> Notices</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN ════════════════════════════════════════════ -->
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="admin-name">Admin</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge">Admin</span>
+        <div class="avatar" id="admin-initial" aria-label="Admin avatar">A</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+      <h1 class="page-title">Rent Management</h1>
+      <p class="page-subtitle">Track payments, create rent records, and log incoming rent payments.</p>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip">💳 Total Pending <strong id="sc-pending">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-danger)">⚠️ Overdue <strong id="sc-overdue">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-success)">💰 Collected (This Month) <strong id="sc-collected">—</strong></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search tenant name or room…" autocomplete="off" />
+        </div>
+        <select id="status-filter" class="filter-select" aria-label="Filter by status">
+          <option value="All">All Statuses</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+        <select id="month-filter" class="filter-select" aria-label="Filter by month">
+          <option value="">All Months</option>
+        </select>
+        <button id="btn-add-rent" class="btn btn-primary" aria-label="Add new rent record">➕ Add Rent</button>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card">
+        <div class="table-header-bar">
+          <span class="table-title">💳 Rent Payment History</span>
+          <span class="record-count-badge" id="record-count">0 records</span>
+        </div>
+        <div class="table-wrap">
+          <table id="rent-table" aria-label="Rent records list">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tenant &amp; Room</th>
+                <th>Amount</th>
+                <th>Rent Month</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Payment Info</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rent-table-body">
+              <!-- Rendered dynamically by rent.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="empty-state" class="empty-state" style="display:none;">
+          <div class="empty-icon">💳</div>
+          <div class="empty-title">No rent records found</div>
+          <div class="empty-sub">Click "Add Rent" to record a new rent invoice.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════ MODALS ═══════════════════════════════════════════ -->
+
+  <!-- Add/Edit Rent Modal -->
+  <div class="modal-backdrop" id="rent-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="rent-modal-title">Record Rent</h2>
+        <button class="modal-close" id="rent-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="rent-form" onsubmit="event.preventDefault();">
+          <input type="hidden" id="rent-id" />
+
+          <!-- Tenant Select -->
+          <div class="form-group" id="tenant-select-group">
+            <label for="f-tenant">Tenant *</label>
+            <select id="f-tenant" class="form-select" required>
+              <option value="">— Select Tenant —</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <!-- Amount -->
+            <div class="form-group">
+              <label for="f-amount">Rent Amount (₹) *</label>
+              <input type="number" id="f-amount" class="form-control" placeholder="0" min="0" required />
+            </div>
+            <!-- Rent Month -->
+            <div class="form-group">
+              <label for="f-rentMonth">Rent Month *</label>
+              <input type="text" id="f-rentMonth" class="form-control" placeholder="e.g. July 2026" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Due Date -->
+            <div class="form-group">
+              <label for="f-dueDate">Due Date *</label>
+              <input type="date" id="f-dueDate" class="form-control" required />
+            </div>
+            <!-- Status (only for edit or optional) -->
+            <div class="form-group" id="status-group" style="display:none;">
+              <label for="f-status">Status</label>
+              <select id="f-status" class="form-select">
+                <option value="Pending">Pending</option>
+                <option value="Paid">Paid</option>
+                <option value="Overdue">Overdue</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Remarks -->
+          <div class="form-group">
+            <label for="f-remarks">Remarks</label>
+            <textarea id="f-remarks" class="form-textarea" rows="3" placeholder="Additional details…"></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="rent-modal-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="rent-modal-submit">Save Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pay Rent Modal -->
+  <div class="modal-backdrop" id="pay-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Confirm Rent Payment</h2>
+        <button class="modal-close" id="pay-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="pay-form" onsubmit="event.preventDefault();">
+          <input type="hidden" id="pay-rent-id" />
+
+          <p style="font-size:0.875rem; color:var(--clr-muted); margin-bottom:1.2rem;" id="pay-invoice-details"></p>
+
+          <div class="form-row">
+            <!-- Payment Date -->
+            <div class="form-group">
+              <label for="p-paymentDate">Payment Date *</label>
+              <input type="date" id="p-paymentDate" class="form-control" required />
+            </div>
+            <!-- Payment Method -->
+            <div class="form-group">
+              <label for="p-paymentMethod">Payment Method *</label>
+              <select id="p-paymentMethod" class="form-select" required>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Cheque">Cheque</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Transaction ID -->
+          <div class="form-group">
+            <label for="p-transactionId">Transaction / Reference ID</label>
+            <input type="text" id="p-transactionId" class="form-control" placeholder="e.g. UPI txn ref number" />
+          </div>
+
+          <!-- Remarks -->
+          <div class="form-group">
+            <label for="p-remarks">Remarks</label>
+            <textarea id="p-remarks" class="form-textarea" rows="2" placeholder="Optional notes…"></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="pay-modal-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="pay-modal-submit">Mark as Paid</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-backdrop" id="delete-modal">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Rent Record</h2>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="delete-rent-id" />
+        <p id="delete-msg" style="font-size:0.9rem; line-height:1.5; color:var(--clr-text); margin-bottom:1.5rem;"></p>
+        <div class="modal-footer" style="margin-top:0;">
+          <button class="btn btn-ghost" id="delete-cancel">Cancel</button>
+          <button class="btn btn-danger" id="delete-confirm">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span id="toast-icon">ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/rent.js"></script>
+</body>
+</html>
