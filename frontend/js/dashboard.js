@@ -65,6 +65,7 @@ const statMap = [
   { id: 'stat-vacant',      key: 'vacantRooms',             label: 'Vacant Rooms',             icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
   { id: 'stat-rent-pend',   key: 'pendingRentPayments',     label: 'Pending / Overdue Rent',   icon: '💳', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: false },
   { id: 'stat-rent-coll',   key: 'monthlyRentCollected',    label: 'Rent Collected (Month)',    icon: '💰', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: true  },
+  { id: 'stat-agreements',  key: 'activeAgreements',        label: 'Active Agreements',        icon: '📜', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
   { id: 'stat-maintenance', key: 'openMaintenanceRequests', label: 'Maintenance Requests',     icon: '🔧', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
   { id: 'stat-visitors',    key: 'todaysVisitorCheckIns',   label: "Today's Check-ins",        icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
   { id: 'stat-expenses',    key: 'monthlyExpenses',         label: 'Monthly Expenses (₹)',     icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },

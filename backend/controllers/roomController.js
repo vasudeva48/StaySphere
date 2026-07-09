@@ -43,11 +43,12 @@ const createRoom = async (req, res) => {
 
     res.status(201).json({ success: true, message: 'Room created successfully', data: room });
   } catch (error) {
+    console.error('Error in createRoom:', error);
     if (error.name === 'ValidationError') {
       const msgs = Object.values(error.errors).map((e) => e.message);
       return res.status(400).json({ success: false, message: msgs.join(', ') });
     }
-    res.status(500).json({ success: false, message: 'Server error. Please try again later.' });
+    res.status(500).json({ success: false, message: error.message || 'Server error. Please try again later.' });
   }
 };
 

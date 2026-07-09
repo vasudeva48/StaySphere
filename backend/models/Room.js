@@ -76,12 +76,11 @@ const roomSchema = new mongoose.Schema(
 );
 
 // ── Pre-save: keep availableBeds & status in sync ─────────────────────
-roomSchema.pre('save', function (next) {
+roomSchema.pre('save', function () {
   this.availableBeds = this.totalBeds - this.occupiedBeds;
   if (this.status !== 'Maintenance') {
     this.status = this.availableBeds === 0 ? 'Full' : 'Available';
   }
-  next();
 });
 
 // ── Static helper: build default bed labels ───────────────────────────

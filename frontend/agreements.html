@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere – Manage digital agreements with tenants." />
+  <title>Agreements Management – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/agreements.css" />
+</head>
+<body>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Main</span>
+      <a href="dashboard.html" class="nav-item" id="nav-dashboard"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="tenants.html"   class="nav-item" id="nav-tenants"><span class="nav-icon">👥</span> Tenants</a>
+      <a href="rooms.html"     class="nav-item" id="nav-rooms"><span class="nav-icon">🛏️</span> Rooms</a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="rent.html" class="nav-item" id="nav-rent"><span class="nav-icon">💳</span> Rent</a>
+      <a href="#" class="nav-item" id="nav-expenses"><span class="nav-icon">📊</span> Expenses</a>
+      <a href="agreements.html" class="nav-item active" id="nav-agreements"><span class="nav-icon">📜</span> Agreements</a>
+
+      <span class="nav-section-label">Operations</span>
+      <a href="#" class="nav-item" id="nav-maintenance"><span class="nav-icon">🔧</span> Maintenance</a>
+      <a href="#" class="nav-item" id="nav-visitors"><span class="nav-icon">🚪</span> Visitors</a>
+      <a href="#" class="nav-item" id="nav-notices"><span class="nav-icon">📋</span> Notices</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN ════════════════════════════════════════════ -->
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="admin-name">Admin</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge">Admin</span>
+        <div class="avatar" id="admin-initial" aria-label="Admin avatar">A</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+      <h1 class="page-title">Digital Agreements</h1>
+      <p class="page-subtitle">Create, monitor, and manage rental agreements and contracts with tenants.</p>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip">📜 Total Agreements <strong id="sc-total">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-success)">✅ Active <strong id="sc-active">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-danger)">⚠️ Expired <strong id="sc-expired">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-warning)">🚫 Terminated <strong id="sc-terminated">—</strong></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search by name, room, agreement number…" autocomplete="off" />
+        </div>
+        <select id="status-filter" class="filter-select" aria-label="Filter by status">
+          <option value="All">All Statuses</option>
+          <option value="Active">Active</option>
+          <option value="Expired">Expired</option>
+          <option value="Terminated">Terminated</option>
+        </select>
+        <button id="btn-add-agreement" class="btn btn-primary" aria-label="Add new agreement">➕ Add Agreement</button>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card">
+        <div class="table-header-bar">
+          <span class="table-title">📜 Digital Agreements Registry</span>
+          <span class="record-count-badge" id="record-count">0 agreements</span>
+        </div>
+        <div class="table-wrap">
+          <table id="agreements-table" aria-label="Agreements registry list">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Agreement No.</th>
+                <th>Tenant &amp; Room</th>
+                <th>Rent &amp; Deposit</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="agreements-table-body">
+              <!-- Rendered dynamically by agreements.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="empty-state" class="empty-state" style="display:none;">
+          <div class="empty-icon">📜</div>
+          <div class="empty-title">No agreements found</div>
+          <div class="empty-sub">Click "Add Agreement" to register a new contract.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════ MODALS ═══════════════════════════════════════════ -->
+
+  <!-- Add/Edit Agreement Modal -->
+  <div class="modal-backdrop" id="agreement-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="agreement-modal-title">Create Rental Agreement</h2>
+        <button class="modal-close" id="agreement-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="agreement-form" onsubmit="event.preventDefault();">
+          <input type="hidden" id="agreement-id" />
+
+          <!-- Form row for Number -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-agreementNumber">Agreement Number *</label>
+              <input type="text" id="f-agreementNumber" class="form-control" placeholder="e.g. AGR-2026-0001" required />
+            </div>
+            <!-- Status dropdown (only for edit, hidden/default Active for add) -->
+            <div class="form-group" id="status-group" style="display:none;">
+              <label for="f-agreementStatus">Agreement Status</label>
+              <select id="f-agreementStatus" class="form-select">
+                <option value="Active">Active</option>
+                <option value="Expired">Expired</option>
+                <option value="Terminated">Terminated</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Selection dropdowns -->
+          <div class="form-row" id="select-groups">
+            <!-- Tenant Selection -->
+            <div class="form-group">
+              <label for="f-tenant">Tenant *</label>
+              <select id="f-tenant" class="form-select" required>
+                <option value="">— Select Tenant —</option>
+              </select>
+            </div>
+            <!-- Room Selection -->
+            <div class="form-group">
+              <label for="f-room">Room *</label>
+              <select id="f-room" class="form-select" required>
+                <option value="">— Select Room —</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dates Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-startDate">Start Date *</label>
+              <input type="date" id="f-startDate" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label for="f-endDate">End Date *</label>
+              <input type="date" id="f-endDate" class="form-control" required />
+            </div>
+          </div>
+
+          <!-- Financial Details Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-monthlyRent">Monthly Rent (₹) *</label>
+              <input type="number" id="f-monthlyRent" class="form-control" placeholder="0" min="0" required />
+            </div>
+            <div class="form-group">
+              <label for="f-securityDeposit">Security Deposit (₹) *</label>
+              <input type="number" id="f-securityDeposit" class="form-control" placeholder="0" min="0" required />
+            </div>
+          </div>
+
+          <!-- Agreement File (optional link) -->
+          <div class="form-group">
+            <label for="f-agreementFile">Agreement Document URL (Optional)</label>
+            <input type="url" id="f-agreementFile" class="form-control" placeholder="e.g. https://link.to/signed-agreement.pdf" />
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group">
+            <label for="f-notes">Notes / Special Clauses</label>
+            <textarea id="f-notes" class="form-textarea" rows="2" placeholder="Additional agreement guidelines or special notes…"></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="agreement-modal-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="agreement-modal-submit">Save Agreement</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail View Modal -->
+  <div class="modal-backdrop" id="detail-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Agreement Details</h2>
+        <button class="modal-close" id="detail-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-grid">
+          <div>
+            <div class="detail-label">Agreement Number</div>
+            <div class="detail-value" id="d-number">—</div>
+          </div>
+          <div>
+            <div class="detail-label">Agreement Status</div>
+            <div class="detail-value" id="d-status">—</div>
+          </div>
+          
+          <div>
+            <div class="detail-label">Tenant Details</div>
+            <div class="detail-value" id="d-tenantName">—</div>
+            <div style="font-size:0.75rem; color:var(--clr-muted); margin-top:0.25rem;" id="d-tenantContact"></div>
+          </div>
+          <div>
+            <div class="detail-label">Assigned Room</div>
+            <div class="detail-value" id="d-roomName">—</div>
+            <div style="font-size:0.75rem; color:var(--clr-muted); margin-top:0.25rem;" id="d-roomType"></div>
+          </div>
+
+          <div>
+            <div class="detail-label">Contract Period</div>
+            <div class="detail-value" id="d-period">—</div>
+          </div>
+          <div>
+            <div class="detail-label">Financial terms</div>
+            <div class="detail-value" id="d-financials">—</div>
+          </div>
+
+          <div class="detail-block">
+            <div class="detail-label">Document Link</div>
+            <div class="detail-value" id="d-fileLink" style="font-size: 0.85rem;">—</div>
+          </div>
+
+          <div class="detail-block" style="margin-top: 0;">
+            <div class="detail-label">Notes &amp; Special Clauses</div>
+            <div class="detail-value" id="d-notes" style="font-size:0.82rem; font-weight:normal; line-height:1.45; white-space:pre-wrap;">—</div>
+          </div>
+        </div>
+        
+        <div class="modal-footer" style="border-top: 1px solid var(--clr-border); padding-top: 1.2rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-ghost" id="detail-modal-close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-backdrop" id="delete-modal">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Rental Agreement</h2>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="delete-agreement-id" />
+        <p id="delete-msg" style="font-size:0.9rem; line-height:1.5; color:var(--clr-text); margin-bottom:1.5rem;"></p>
+        <div class="modal-footer" style="margin-top:0;">
+          <button class="btn btn-ghost" id="delete-cancel">Cancel</button>
+          <button class="btn btn-danger" id="delete-confirm">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span id="toast-icon">ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/agreements.js"></script>
+</body>
+</html>

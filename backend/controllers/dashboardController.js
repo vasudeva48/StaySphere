@@ -1,6 +1,7 @@
 const Tenant = require('../models/Tenant');
 const Room   = require('../models/Room');
 const Rent   = require('../models/Rent');
+const Agreement = require('../models/Agreement');
 
 /**
  * @desc    Get Owner Dashboard summary statistics
@@ -9,8 +10,11 @@ const Rent   = require('../models/Rent');
  */
 const getDashboardStats = async (req, res) => {
   try {
-    // Refresh overdue rent statuses first
-    await Rent.refreshOverdue();
+    // Refresh overdue rent and expired agreements statuses first
+    await Promise.all([
+      Rent.refreshOverdue(),
+      Agreement.refreshExpiredStatus()
+    ]);
 
     // ── Tenants ───────────────────────────────────────────────
     const totalTenants = await Tenant.countDocuments({ status: 'Active' });
@@ -37,6 +41,9 @@ const getDashboardStats = async (req, res) => {
 
     const monthlyRentCollected = paidThisMonthAgg[0]?.total || 0;
 
+    // ── Agreements ────────────────────────────────────────────
+    const activeAgreements = await Agreement.countDocuments({ agreementStatus: 'Active' });
+
     // ── Maintenance ───────────────────────────────────────────
     // TODO: replace with MaintenanceRequest.countDocuments({ status: 'Open' })
     const openMaintenanceRequests = 0;
@@ -58,6 +65,7 @@ const getDashboardStats = async (req, res) => {
         vacantRooms,
         pendingRentPayments,
         monthlyRentCollected,
+        activeAgreements,
         openMaintenanceRequests,
         todaysVisitorCheckIns,
         monthlyExpenses,
