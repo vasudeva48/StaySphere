@@ -1,43 +1,111 @@
-# StaySphere
+# StaySphere – PG & Hostel Management Platform
 
-A full-stack web application for discovering and booking unique stays around the globe.
+StaySphere is a full-stack PG & Hostel Management Platform built using the MERN stack. It helps hostel owners efficiently manage tenants, rooms, rent collection, agreements, and maintenance requests through a centralized dashboard.
+
+## Features Completed
+
+- User Authentication (Register & Login)
+- JWT-based Secure Authentication
+- Owner Dashboard
+- Tenant Management
+- Room & Bed Management
+- Online Rent Collection
+- Digital Agreements
+- Maintenance Requests
+
+## Tech Stack
+
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
+
+### Backend
+- Node.js
+- Express.js
+
+### Database
+- MongoDB Atlas
+- Mongoose
+
+### Authentication
+- JWT (JSON Web Token)
+- bcrypt
+
+---
 
 ## Project Structure
 
-```
+```text
 StaySphere/
 ├── frontend/
 │   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   ├── tenants.html
+│   ├── rooms.html
+│   ├── rent.html
+│   ├── agreements.html
+│   ├── maintenance.html
 │   ├── css/
-│   │   └── styles.css
 │   └── js/
-│       └── app.js
+│
 └── backend/
+    ├── config/
+    ├── controllers/
+    ├── middleware/
+    ├── models/
+    ├── routes/
     ├── server.js
     ├── package.json
-    └── .gitignore
-```
+    └── .env.example
 
-## Getting Started
 
-### Backend
 
-```bash
+INSTALLATION
+
+
+
 cd backend
 npm install
-npm run dev      # development (nodemon)
-# or
-npm start        # production
-```
+npm run dev
 
-The server will start at **http://localhost:5000**
+Backend Runs At:
 
-### Frontend
+http://localhost:5000
 
-Open `frontend/index.html` directly in your browser, or serve it with any static file server.
+FRONTEND
 
-## API
+Open the frontend using Live Server or any static server.
 
-| Method | Route | Description               |
-|--------|-------|---------------------------|
-| GET    | `/`   | Health check              |
+AUTHENTICATION
+
+•User Registration
+•User Login
+•JWT Authentication
+•Role-based Authorization (Admin & Tenant)
+
+COMPLETED MODULES
+
+•Owner Dashboard
+•Tenant Management
+•Room & Bed Management
+•Rent Management
+•Digital Agreements
+•Maintenance Requests
+
+UPCOMING FEATURES
+
+•Visitor Management
+•Expense Tracking
+•Attendance & Check-In
+Notice Board
+
+AUTHOR
+
+Vasu Dev
+
+
+
+
