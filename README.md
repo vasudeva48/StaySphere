@@ -75,7 +75,7 @@ StaySphere/
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/StaySphere.git
+git clone https://github.com/vasudeva48/StaySphere.git
 cd StaySphere
 ```
 
