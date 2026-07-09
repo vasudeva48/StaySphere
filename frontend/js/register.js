@@ -1,14 +1,38 @@
 /* ─────────────────────────────────────────────────────────────────────────
    register.js – Handles registration form validation and POST /api/auth/register
+
+   Auth-aware early check:
+   If ss_token exists in localStorage we verify it against GET /api/auth/me.
+   - Valid token  → redirect to dashboard.html
+   - Invalid/expired token → clear localStorage and show the register form
 ───────────────────────────────────────────────────────────────────────── */
 
 const API_BASE = 'http://localhost:5000/api';
 
-// Redirect if already logged in
-if (localStorage.getItem('ss_token') && localStorage.getItem('ss_user')) {
-  const u = JSON.parse(localStorage.getItem('ss_user'));
-  window.location.href = u?.role === 'Admin' ? 'dashboard.html' : 'index.html';
-}
+// ── Async token validation (runs before showing form) ────────────────────────
+(async () => {
+  const token = localStorage.getItem('ss_token');
+  if (!token) return; // no token → show form immediately
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.ok) {
+      // Token still valid → go to dashboard
+      window.location.href = 'dashboard.html';
+      return;
+    }
+    // Token invalid / expired → clear stale data and show the form
+    localStorage.removeItem('ss_token');
+    localStorage.removeItem('ss_user');
+  } catch (_) {
+    // Backend unreachable → clear token, show the form anyway
+    localStorage.removeItem('ss_token');
+    localStorage.removeItem('ss_user');
+  }
+})();
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const form           = document.getElementById('register-form');

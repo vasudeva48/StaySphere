@@ -8,7 +8,7 @@ const API_BASE = 'http://localhost:5000/api';
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');
 const user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
-if (!token || !user) window.location.href = 'index.html';
+if (!token || !user) { window.location.href = 'index.html'; throw new Error('Unauthenticated'); }
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const adminNameEl    = document.getElementById('admin-name');

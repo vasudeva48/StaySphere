@@ -6,6 +6,7 @@ const user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
 
 if (!token || !user) {
   window.location.href = 'index.html';
+  throw new Error('Unauthenticated – redirecting');
 }
 
 // ── DOM refs ──────────────────────────────────────────────────────────

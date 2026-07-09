@@ -1,14 +1,38 @@
 /* ─────────────────────────────────────────────────────────────────────────
    login.js – Handles login form validation and POST /api/auth/login
+   
+   Auth-aware early check:
+   If ss_token exists in localStorage we verify it against GET /api/auth/me.
+   - Valid token  → redirect to dashboard.html (always — prevents silent loop)
+   - Invalid/expired token → clear localStorage and show the login form
 ───────────────────────────────────────────────────────────────────────── */
 
 const API_BASE = 'http://localhost:5000/api';
 
-// Redirect if already logged in
-if (localStorage.getItem('ss_token') && localStorage.getItem('ss_user')) {
-  const u = JSON.parse(localStorage.getItem('ss_user'));
-  window.location.href = u?.role === 'Admin' ? 'dashboard.html' : 'index.html';
-}
+// ── Async token validation (runs before showing form) ────────────────────────
+(async () => {
+  const token = localStorage.getItem('ss_token');
+  if (!token) return; // no token → show form immediately
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.ok) {
+      // Token is still valid → go to dashboard
+      window.location.href = 'dashboard.html';
+      return;
+    }
+    // Token invalid / expired → clear stale data and show the form
+    localStorage.removeItem('ss_token');
+    localStorage.removeItem('ss_user');
+  } catch (_) {
+    // Backend unreachable → clear token, show the form anyway
+    localStorage.removeItem('ss_token');
+    localStorage.removeItem('ss_user');
+  }
+})();
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const form          = document.getElementById('login-form');
@@ -116,9 +140,9 @@ form.addEventListener('submit', async (e) => {
 
     showSuccess('Login successful! Redirecting…');
 
-    // ── Redirect based on role ────────────────────────────────
+    // ── All roles go to dashboard – dashboard handles role display ──
     setTimeout(() => {
-      window.location.href = json.data.role === 'Admin' ? 'dashboard.html' : 'index.html';
+      window.location.href = 'dashboard.html';
     }, 900);
 
   } catch (err) {
