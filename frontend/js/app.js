@@ -1,9 +1,15 @@
 // StaySphere – Frontend Entry Point
-// Ready for future API integration and feature development
+console.log('StaySphere frontend loaded.');
 
-console.log('StaySphere frontend loaded successfully.');
+// ── Global logout utility ────────────────────────────────────────────────────
+// Called from any page that has a logout button wired to this function.
+window.ssLogout = function () {
+  localStorage.removeItem('ss_token');
+  localStorage.removeItem('ss_user');
+  window.location.href = 'index.html';
+};
 
-// Example: ping backend health check (uncomment when backend is running)
+// ── Example: ping backend health check (uncomment when backend is running) ──
 // fetch('http://localhost:5000/')
 //   .then(res => res.text())
 //   .then(data => console.log('Backend says:', data))

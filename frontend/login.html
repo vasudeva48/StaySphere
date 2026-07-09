@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sign in to your StaySphere account and manage your hostel." />
+  <title>Sign In – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+
+      <!-- Header -->
+      <div class="auth-card-header">
+        <a href="index.html" class="auth-logo">Stay<span>Sphere</span></a>
+        <div class="auth-icon">🔐</div>
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-subtitle">Sign in to access your owner dashboard</p>
+      </div>
+
+      <!-- Body -->
+      <div class="auth-card-body">
+        <form id="login-form" novalidate>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <div class="input-wrap">
+              <span class="input-icon">📧</span>
+              <input
+                type="email"
+                id="email"
+                class="form-input"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+            </div>
+            <span class="field-error" id="email-error">Please enter a valid email address.</span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input
+                type="password"
+                id="password"
+                class="form-input"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              />
+              <button type="button" class="toggle-pw" id="toggle-pw" aria-label="Toggle password visibility">👁️</button>
+            </div>
+            <span class="field-error" id="password-error">Password is required.</span>
+          </div>
+
+          <!-- Alert -->
+          <div class="alert alert-error" id="error-alert" role="alert">
+            <span>❌</span>
+            <span id="error-msg">Something went wrong. Please try again.</span>
+          </div>
+
+          <div class="alert alert-success" id="success-alert" role="status">
+            <span>✅</span>
+            <span id="success-msg">Login successful! Redirecting…</span>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-submit" id="submit-btn">
+            <span id="btn-text">Sign In</span>
+          </button>
+
+        </form>
+
+        <!-- Footer -->
+        <div class="auth-footer">
+          Don't have an account?
+          <a href="register.html" class="auth-link">Create one →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/login.js"></script>
+</body>
+</html>

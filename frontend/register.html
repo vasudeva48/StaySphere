@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Create a StaySphere account to start managing your hostel." />
+  <title>Create Account – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card" style="max-width: 520px;">
+
+      <!-- Header -->
+      <div class="auth-card-header">
+        <a href="index.html" class="auth-logo">Stay<span>Sphere</span></a>
+        <div class="auth-icon">🏠</div>
+        <h1 class="auth-title">Create your account</h1>
+        <p class="auth-subtitle">Register as an owner to manage your hostel</p>
+      </div>
+
+      <!-- Body -->
+      <div class="auth-card-body">
+        <form id="register-form" novalidate>
+
+          <!-- Full Name & Phone (2-col) -->
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="fullName">Full Name *</label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="fullName" class="form-input" placeholder="Jane Doe" autocomplete="name" required />
+              </div>
+              <span class="field-error" id="fullName-error">Full name is required.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number *</label>
+              <div class="input-wrap">
+                <span class="input-icon">📱</span>
+                <input type="tel" id="phoneNumber" class="form-input" placeholder="9876543210" autocomplete="tel" required />
+              </div>
+              <span class="field-error" id="phoneNumber-error">Phone number is required.</span>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <div class="input-wrap">
+              <span class="input-icon">📧</span>
+              <input type="email" id="email" class="form-input" placeholder="you@example.com" autocomplete="email" required />
+            </div>
+            <span class="field-error" id="email-error">Please enter a valid email address.</span>
+          </div>
+
+          <!-- Role -->
+          <div class="form-group">
+            <label for="role">Account Role *</label>
+            <div class="input-wrap">
+              <span class="input-icon">🛡️</span>
+              <select id="role" class="form-select" required>
+                <option value="Admin">Admin (Hostel Owner)</option>
+                <option value="Tenant">Tenant</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Password & Confirm (2-col) -->
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="password">Password *</label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="password" class="form-input" placeholder="Min. 6 characters" autocomplete="new-password" required />
+                <button type="button" class="toggle-pw" id="toggle-pw" aria-label="Toggle password">👁️</button>
+              </div>
+              <span class="field-error" id="password-error">Password must be at least 6 characters.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password *</label>
+              <div class="input-wrap">
+                <span class="input-icon">🔑</span>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Repeat password" autocomplete="new-password" required />
+                <button type="button" class="toggle-pw" id="toggle-cpw" aria-label="Toggle confirm password">👁️</button>
+              </div>
+              <span class="field-error" id="confirmPassword-error">Passwords do not match.</span>
+            </div>
+          </div>
+
+          <!-- Alert -->
+          <div class="alert alert-error" id="error-alert" role="alert">
+            <span>❌</span>
+            <span id="error-msg">Something went wrong.</span>
+          </div>
+
+          <div class="alert alert-success" id="success-alert" role="status">
+            <span>✅</span>
+            <span id="success-msg">Account created! Redirecting to login…</span>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-submit" id="submit-btn">
+            <span id="btn-text">Create Account</span>
+          </button>
+
+        </form>
+
+        <!-- Footer -->
+        <div class="auth-footer">
+          Already have an account?
+          <a href="login.html" class="auth-link">Sign in →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/register.js"></script>
+</body>
+</html>
