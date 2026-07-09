@@ -63,7 +63,7 @@ StaySphere/
 
 
 
-INSTALLATION
+#INSTALLATION
 
 
 
@@ -71,22 +71,22 @@ cd backend
 npm install
 npm run dev
 
-Backend Runs At:
+#Backend Runs At:
 
 http://localhost:5000
 
-FRONTEND
+#FRONTEND
 
 Open the frontend using Live Server or any static server.
 
-AUTHENTICATION
+#AUTHENTICATION
 
 •User Registration
 •User Login
 •JWT Authentication
 •Role-based Authorization (Admin & Tenant)
 
-COMPLETED MODULES
+#COMPLETED MODULES
 
 •Owner Dashboard
 •Tenant Management
@@ -95,14 +95,14 @@ COMPLETED MODULES
 •Digital Agreements
 •Maintenance Requests
 
-UPCOMING FEATURES
+#UPCOMING FEATURES
 
 •Visitor Management
 •Expense Tracking
 •Attendance & Check-In
 Notice Board
 
-AUTHOR
+#AUTHOR
 
 Vasu Dev
 
