@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere Owner Dashboard – manage tenants, rooms, rent, and more." />
+  <title>Owner Dashboard – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+  <!-- ── Sidebar overlay (mobile) ─────────────────────────── -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  SIDEBAR                                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Main</span>
+
+      <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="#" class="nav-item" id="nav-tenants">
+        <span class="nav-icon">👥</span> Tenants
+      </a>
+      <a href="#" class="nav-item" id="nav-rooms">
+        <span class="nav-icon">🛏️</span> Rooms
+      </a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="#" class="nav-item" id="nav-rent">
+        <span class="nav-icon">💳</span> Rent
+      </a>
+      <a href="#" class="nav-item" id="nav-expenses">
+        <span class="nav-icon">📊</span> Expenses
+      </a>
+
+      <span class="nav-section-label">Operations</span>
+      <a href="#" class="nav-item" id="nav-maintenance">
+        <span class="nav-icon">🔧</span> Maintenance
+      </a>
+      <a href="#" class="nav-item" id="nav-visitors">
+        <span class="nav-icon">🚪</span> Visitors
+      </a>
+      <a href="#" class="nav-item" id="nav-notices">
+        <span class="nav-icon">📋</span> Notices
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  MAIN                                                  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="admin-name">Admin</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge">Admin</span>
+        <div class="avatar" id="admin-initial" aria-label="Admin avatar">A</div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="content">
+
+      <h1 class="page-title">Owner Dashboard</h1>
+      <p class="page-subtitle">Here's a real-time overview of your hostel operations.</p>
+
+      <!-- ── Stat Cards ────────────────────────────────────── -->
+      <div class="stats-grid" id="stats-grid">
+        <!-- Populated dynamically by dashboard.js -->
+      </div>
+
+      <!-- ── Placeholder Sections ──────────────────────────── -->
+      <div class="sections-row">
+
+        <!-- Recent Tenants -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <h2 class="section-card-title">👥 Recent Tenants</h2>
+            <span class="placeholder-badge">Coming Soon</span>
+          </div>
+          <div class="placeholder-body">
+            <div class="placeholder-row"></div>
+            <div class="placeholder-row"></div>
+            <div class="placeholder-row"></div>
+          </div>
+        </div>
+
+        <!-- Pending Rent -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <h2 class="section-card-title">💳 Pending Rent</h2>
+            <span class="placeholder-badge">Coming Soon</span>
+          </div>
+          <div class="placeholder-body">
+            <div class="placeholder-row"></div>
+            <div class="placeholder-row"></div>
+            <div class="placeholder-row"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="sections-row">
+
+        <!-- Maintenance Requests -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <h2 class="section-card-title">🔧 Maintenance Requests</h2>
+            <span class="placeholder-badge">Coming Soon</span>
+          </div>
+          <div class="placeholder-body">
+            <div class="placeholder-row"></div>
+            <div class="placeholder-row"></div>
+          </div>
+        </div>
+
+        <!-- Today's Visitors -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <h2 class="section-card-title">🚪 Today's Visitors</h2>
+            <span class="placeholder-badge">Coming Soon</span>
+          </div>
+          <div class="placeholder-body">
+            <div class="placeholder-row"></div>
+            <div class="placeholder-row"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Quick Actions ──────────────────────────────────── -->
+      <div class="section-card" style="margin-bottom: 2rem;">
+        <div class="section-card-header">
+          <h2 class="section-card-title">⚡ Quick Actions</h2>
+        </div>
+        <div class="quick-actions">
+          <a href="#" class="action-btn" id="action-add-tenant">
+            <span class="action-icon">➕</span> Add Tenant
+          </a>
+          <a href="#" class="action-btn" id="action-add-room">
+            <span class="action-icon">🛏️</span> Add Room
+          </a>
+          <a href="#" class="action-btn" id="action-record-rent">
+            <span class="action-icon">💰</span> Record Rent
+          </a>
+          <a href="#" class="action-btn" id="action-log-maintenance">
+            <span class="action-icon">🔧</span> Log Maintenance
+          </a>
+          <a href="#" class="action-btn" id="action-log-visitor">
+            <span class="action-icon">🚪</span> Log Visitor
+          </a>
+          <a href="#" class="action-btn" id="action-post-notice">
+            <span class="action-icon">📋</span> Post Notice
+          </a>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /.main -->
+
+  <!-- ── Toast ─────────────────────────────────────────────── -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span>ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
