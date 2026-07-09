@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere – Manage rooms and bed assignments." />
+  <title>Rooms – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/rooms.css" />
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Main</span>
+      <a href="dashboard.html" class="nav-item" id="nav-dashboard"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="tenants.html"   class="nav-item" id="nav-tenants"><span class="nav-icon">👥</span> Tenants</a>
+      <a href="rooms.html"     class="nav-item active" id="nav-rooms"><span class="nav-icon">🛏️</span> Rooms</a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="#" class="nav-item" id="nav-rent"><span class="nav-icon">💳</span> Rent</a>
+      <a href="#" class="nav-item" id="nav-expenses"><span class="nav-icon">📊</span> Expenses</a>
+
+      <span class="nav-section-label">Operations</span>
+      <a href="#" class="nav-item" id="nav-maintenance"><span class="nav-icon">🔧</span> Maintenance</a>
+      <a href="#" class="nav-item" id="nav-visitors"><span class="nav-icon">🚪</span> Visitors</a>
+      <a href="#" class="nav-item" id="nav-notices"><span class="nav-icon">📋</span> Notices</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN ════════════════════════════════════════════ -->
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="admin-name">Admin</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge">Admin</span>
+        <div class="avatar" id="admin-initial" aria-label="Admin avatar">A</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <h1 class="page-title">Room &amp; Bed Management</h1>
+      <p class="page-subtitle">Create rooms, track occupancy, and assign tenants to beds.</p>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip">🏠 Total <strong id="sc-total">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-success)">✅ Available <strong id="sc-available">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-danger)">🔒 Full <strong id="sc-full">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-warning)">🔧 Maintenance <strong id="sc-maintenance">—</strong></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search room number or floor…" autocomplete="off" />
+        </div>
+        <select id="type-filter"   class="filter-select" aria-label="Filter by type">
+          <option value="">All Types</option>
+          <option value="Single">Single</option>
+          <option value="Double">Double</option>
+          <option value="Triple">Triple</option>
+          <option value="Dormitory">Dormitory</option>
+        </select>
+        <select id="status-filter" class="filter-select" aria-label="Filter by status">
+          <option value="">All Status</option>
+          <option value="Available">Available</option>
+          <option value="Full">Full</option>
+          <option value="Maintenance">Maintenance</option>
+        </select>
+        <button id="btn-add-room" class="btn btn-primary" aria-label="Add new room">➕ Add Room</button>
+      </div>
+
+      <!-- Rooms Grid -->
+      <div class="rooms-grid" id="rooms-grid"></div>
+
+      <div id="empty-state" class="empty-state" style="display:none;">
+        <div class="empty-icon">🛏️</div>
+        <div class="empty-title">No rooms found</div>
+        <div class="empty-sub">Click "Add Room" to create your first room.</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════ ADD / EDIT ROOM MODAL ═══════════════════════════ -->
+  <div class="modal-backdrop" id="room-modal" role="dialog" aria-modal="true" aria-labelledby="room-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="room-modal-title">Add Room</span>
+        <button class="modal-close" id="room-modal-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="room-form" novalidate>
+          <input type="hidden" id="room-id" />
+          <p class="form-section-label">Room Details</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="f-roomNumber">Room Number *</label>
+              <input type="text" id="f-roomNumber" placeholder="101" required />
+            </div>
+            <div class="form-group">
+              <label for="f-roomType">Room Type *</label>
+              <select id="f-roomType" required>
+                <option value="">Select type</option>
+                <option value="Single">Single</option>
+                <option value="Double">Double</option>
+                <option value="Triple">Triple</option>
+                <option value="Dormitory">Dormitory</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-floorNumber">Floor Number</label>
+              <input type="text" id="f-floorNumber" placeholder="Ground / 1 / 2…" />
+            </div>
+            <div class="form-group">
+              <label for="f-totalBeds">Total Beds *</label>
+              <input type="number" id="f-totalBeds" placeholder="2" min="1" required />
+            </div>
+            <div class="form-group">
+              <label for="f-monthlyRent">Monthly Rent (₹)</label>
+              <input type="number" id="f-monthlyRent" placeholder="5000" min="0" />
+            </div>
+            <div class="form-group">
+              <label for="f-roomStatus">Status</label>
+              <select id="f-roomStatus">
+                <option value="Available">Available</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid cols-1" style="margin-top:0.75rem;">
+            <div class="form-group">
+              <label for="f-description">Description</label>
+              <input type="text" id="f-description" placeholder="AC, WiFi, attached bathroom…" />
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="room-modal-cancel">Cancel</button>
+        <button class="btn btn-primary" id="room-modal-submit">Save Room</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ ASSIGN TENANT MODAL ═════════════════════════════ -->
+  <div class="modal-backdrop" id="assign-modal" role="dialog" aria-modal="true" aria-labelledby="assign-modal-title">
+    <div class="modal assign-modal">
+      <div class="modal-header">
+        <span class="modal-title" id="assign-modal-title">Assign Tenant</span>
+        <button class="modal-close" id="assign-modal-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="assign-room-id" />
+
+        <p class="form-section-label">Select Bed</p>
+        <div class="beds-picker" id="beds-picker"></div>
+        <input type="hidden" id="selected-bed-label" />
+
+        <p class="form-section-label">Select Tenant</p>
+        <div class="form-group">
+          <label for="assign-tenant-select">Unassigned Active Tenants</label>
+          <select id="assign-tenant-select">
+            <option value="">Loading…</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="assign-modal-cancel">Cancel</button>
+        <button class="btn btn-success" id="assign-modal-submit">Assign Tenant</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ UNASSIGN CONFIRM ════════════════════════════════ -->
+  <div class="modal-backdrop" id="unassign-modal" role="dialog" aria-modal="true">
+    <div class="confirm-dialog">
+      <div class="confirm-icon">🔓</div>
+      <div class="confirm-title">Unassign Tenant?</div>
+      <p class="confirm-msg" id="unassign-msg">This will remove the tenant from their bed.</p>
+      <input type="hidden" id="unassign-room-id" />
+      <input type="hidden" id="unassign-tenant-id" />
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" id="unassign-cancel">Cancel</button>
+        <button class="btn btn-danger" id="unassign-confirm">Yes, Unassign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ DELETE CONFIRM ══════════════════════════════════ -->
+  <div class="modal-backdrop" id="delete-modal" role="dialog" aria-modal="true">
+    <div class="confirm-dialog">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">Delete Room?</div>
+      <p class="confirm-msg" id="delete-msg">This action cannot be undone.</p>
+      <input type="hidden" id="delete-room-id" />
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" id="delete-cancel">Cancel</button>
+        <button class="btn btn-danger" id="delete-confirm">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span id="toast-icon">ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <script src="js/rooms.js"></script>
+</body>
+</html>

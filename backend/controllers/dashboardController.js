@@ -1,24 +1,22 @@
 const Tenant = require('../models/Tenant');
+const Room   = require('../models/Room');
 
 /**
  * @desc    Get Owner Dashboard summary statistics
  * @route   GET /api/dashboard/stats
  * @access  Private – Admin only
- *
- * Modules not yet implemented return 0.
- * Each section is clearly marked so values can be replaced
- * with real DB queries as features are built out.
  */
 const getDashboardStats = async (req, res) => {
   try {
-    // ── Tenants ──────────────────────────────────────────
+    // ── Tenants ───────────────────────────────────────────────
     const totalTenants = await Tenant.countDocuments({ status: 'Active' });
 
     // ── Rooms ─────────────────────────────────────────────────
-    // TODO: replace with Room.countDocuments() queries when Room module is ready
-    const totalRooms    = 0;
-    const occupiedRooms = 0;
-    const vacantRooms   = 0;
+    const [totalRooms, occupiedRooms, vacantRooms] = await Promise.all([
+      Room.countDocuments(),
+      Room.countDocuments({ status: 'Full' }),
+      Room.countDocuments({ status: 'Available' }),
+    ]);
 
     // ── Rent ──────────────────────────────────────────────────
     // TODO: replace with RentPayment.countDocuments({ status: 'Pending' })
