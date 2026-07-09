@@ -66,7 +66,8 @@ const statMap = [
   { id: 'stat-rent-pend',   key: 'pendingRentPayments',     label: 'Pending / Overdue Rent',   icon: '💳', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: false },
   { id: 'stat-rent-coll',   key: 'monthlyRentCollected',    label: 'Rent Collected (Month)',    icon: '💰', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: true  },
   { id: 'stat-agreements',  key: 'activeAgreements',        label: 'Active Agreements',        icon: '📜', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
-  { id: 'stat-maintenance', key: 'openMaintenanceRequests', label: 'Maintenance Requests',     icon: '🔧', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
+  { id: 'stat-maintenance-open', key: 'openMaintenanceRequests', label: 'Open Maintenance Requests',  icon: '🔧', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
+  { id: 'stat-maintenance-res',  key: 'resolvedMaintenanceRequests', label: 'Resolved Maintenance Requests',icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',  rupees: false },
   { id: 'stat-visitors',    key: 'todaysVisitorCheckIns',   label: "Today's Check-ins",        icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
   { id: 'stat-expenses',    key: 'monthlyExpenses',         label: 'Monthly Expenses (₹)',     icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },
 ];
@@ -123,6 +124,7 @@ async function fetchStats() {
 
     populateStats(json.data);
     loadRecentPendingRent(); // Load dynamic pending list too
+    loadRecentMaintenanceRequests(); // Load dynamic maintenance requests list
   } catch (err) {
     showToast(err.message || 'Could not reach server', true);
     // Show dashes on failure
@@ -171,6 +173,62 @@ async function loadRecentPendingRent() {
   } catch (err) {
     console.error('Error loading pending rent list on dashboard:', err);
     listEl.innerHTML = '<div style="text-align:center; color:var(--clr-danger); font-size:0.85rem; padding:1rem 0;">Could not load pending rent records</div>';
+  }
+}
+
+// ── Fetch and display recent open maintenance requests ─────────────────
+async function loadRecentMaintenanceRequests() {
+  const listEl = document.getElementById('maintenance-requests-list');
+  if (!listEl) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/maintenance?status=Pending`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message);
+
+    // Get up to 3 pending or in progress requests
+    const records = (json.data || []).filter(r => r.status !== 'Resolved').slice(0, 3);
+    
+    if (!records.length) {
+      listEl.innerHTML = '<div style="text-align:center; color:var(--clr-muted); font-size:0.85rem; padding:1.2rem 0;">🎉 No open maintenance requests!</div>';
+      return;
+    }
+
+    listEl.innerHTML = records.map(r => {
+      const priorityColors = {
+        High: '#ef4444',
+        Medium: '#f59e0b',
+        Low: '#22c55e'
+      };
+      const pColor = priorityColors[r.priority] || '#fff';
+      const tenantName = r.tenant ? r.tenant.fullName : 'Tenant';
+      const roomNum = r.tenant ? r.tenant.roomNumber : '—';
+
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.8rem; background:var(--clr-surface-2); border-radius:var(--radius-sm); border:1px solid var(--clr-border);">
+          <div>
+            <div style="font-weight:600; font-size:0.875rem; color:var(--clr-text);">${r.requestTitle}</div>
+            <div style="font-size:0.75rem; color:var(--clr-muted); margin-top:0.15rem;">
+              by ${tenantName} (Room ${roomNum}) · ${r.category}
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:0.7rem; font-weight:700; color:${pColor}; border:1px solid ${pColor}40; background:${pColor}10; padding:0.15rem 0.4rem; border-radius:10px; display:inline-block;">
+              ${r.priority}
+            </span>
+            <div style="font-size:0.68rem; color:var(--clr-muted); margin-top:0.25rem;">
+              Status: <span style="font-weight:600; color:var(--clr-accent);">${r.status}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch (err) {
+    console.error('Error loading maintenance list on dashboard:', err);
+    listEl.innerHTML = '<div style="text-align:center; color:var(--clr-danger); font-size:0.85rem; padding:1rem 0;">Could not load maintenance requests</div>';
   }
 }
 

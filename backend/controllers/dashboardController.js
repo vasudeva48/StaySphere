@@ -2,6 +2,7 @@ const Tenant = require('../models/Tenant');
 const Room   = require('../models/Room');
 const Rent   = require('../models/Rent');
 const Agreement = require('../models/Agreement');
+const MaintenanceRequest = require('../models/MaintenanceRequest');
 
 /**
  * @desc    Get Owner Dashboard summary statistics
@@ -45,8 +46,10 @@ const getDashboardStats = async (req, res) => {
     const activeAgreements = await Agreement.countDocuments({ agreementStatus: 'Active' });
 
     // ── Maintenance ───────────────────────────────────────────
-    // TODO: replace with MaintenanceRequest.countDocuments({ status: 'Open' })
-    const openMaintenanceRequests = 0;
+    const [openMaintenanceRequests, resolvedMaintenanceRequests] = await Promise.all([
+      MaintenanceRequest.countDocuments({ status: { $in: ['Pending', 'In Progress'] } }),
+      MaintenanceRequest.countDocuments({ status: 'Resolved' })
+    ]);
 
     // ── Visitors ──────────────────────────────────────────────
     // TODO: replace with Visitor.countDocuments({ checkInDate: today })
@@ -67,6 +70,7 @@ const getDashboardStats = async (req, res) => {
         monthlyRentCollected,
         activeAgreements,
         openMaintenanceRequests,
+        resolvedMaintenanceRequests,
         todaysVisitorCheckIns,
         monthlyExpenses,
         admin: {

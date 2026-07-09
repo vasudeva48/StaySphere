@@ -11,6 +11,7 @@ const tenantRoutes    = require('./routes/tenantRoutes');
 const roomRoutes      = require('./routes/roomRoutes');
 const rentRoutes      = require('./routes/rentRoutes');
 const agreementRoutes = require('./routes/agreementRoutes');
+const maintenanceRoutes = require('./routes/maintenanceRoutes');
 
 
 const app  = express();
@@ -32,6 +33,7 @@ app.use('/api/tenants',   tenantRoutes);
 app.use('/api/rooms',     roomRoutes);
 app.use('/api/rent',      rentRoutes);
 app.use('/api/agreements', agreementRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
 
 // ── Start Server ───────────────────────────────────────────
 app.listen(PORT, () => {
