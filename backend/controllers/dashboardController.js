@@ -1,3 +1,5 @@
+const Tenant = require('../models/Tenant');
+
 /**
  * @desc    Get Owner Dashboard summary statistics
  * @route   GET /api/dashboard/stats
@@ -9,9 +11,8 @@
  */
 const getDashboardStats = async (req, res) => {
   try {
-    // ── Tenants ───────────────────────────────────────────────
-    // TODO: replace with Tenant.countDocuments() when Tenant module is ready
-    const totalTenants = 0;
+    // ── Tenants ──────────────────────────────────────────
+    const totalTenants = await Tenant.countDocuments({ status: 'Active' });
 
     // ── Rooms ─────────────────────────────────────────────────
     // TODO: replace with Room.countDocuments() queries when Room module is ready

@@ -7,6 +7,7 @@ const connectDB  = require('./config/db');
 const indexRoutes     = require('./routes/index');
 const authRoutes      = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const tenantRoutes    = require('./routes/tenantRoutes');
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/',              indexRoutes);
 app.use('/api/auth',      authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/tenants',   tenantRoutes);
 
 // ── Start Server ───────────────────────────────────────────
 app.listen(PORT, () => {
