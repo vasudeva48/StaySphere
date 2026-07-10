@@ -2,6 +2,7 @@
    notices.js — Notice Board Management Logic (Admin Panel)
    ─────────────────────────────────────────────────────────────────────────── */
 
+const API_BASE = 'http://localhost:5000/api';
 
 // ── Auth Guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');

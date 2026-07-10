@@ -9,6 +9,7 @@
    ⛔  No token at all             → login.html immediately
 ───────────────────────────────────────────────────────────────────────── */
 
+const API_BASE = 'http://localhost:5000/api';
 
 const _token = localStorage.getItem('ss_token');
 const _user  = JSON.parse(localStorage.getItem('ss_user') || 'null');

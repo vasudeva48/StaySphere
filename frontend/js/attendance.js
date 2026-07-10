@@ -4,6 +4,7 @@
    Check-In / Check-Out operations, stats summary, log history, search and filters.
    ─────────────────────────────────────────────────────────────────────────── */
 
+const API_BASE = 'http://localhost:5000/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');

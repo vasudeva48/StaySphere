@@ -1,5 +1,5 @@
 // StaySphere – Homepage Entry Point
-// API_BASE is defined in js/config.js (loaded before this script)
+const API_BASE = 'http://localhost:5000/api';
 
 // ── Homepage auth awareness ───────────────────────────────────────────────────
 // If a valid session exists, swap the nav Sign In / Register links for a

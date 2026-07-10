@@ -4,6 +4,7 @@
    CRUD operations, Check-In/Check-Out flow, and statistics updates.
 ─────────────────────────────────────────────────────────────────────────── */
 
+const API_BASE = 'http://localhost:5000/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');

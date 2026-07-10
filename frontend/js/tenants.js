@@ -3,6 +3,7 @@
    Relies on ss_token and ss_user being set in localStorage by the login flow.
 ───────────────────────────────────────────────────────────────────────────── */
 
+const API_BASE = 'http://localhost:5000/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');

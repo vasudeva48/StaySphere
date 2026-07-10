@@ -3,7 +3,7 @@
    Handles authorization, API interaction, stats computation, and search/filtering.
    ─────────────────────────────────────────────────────────────────────────── */
 
-const apiBase = API_BASE;
+const apiBase = typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:5000/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');

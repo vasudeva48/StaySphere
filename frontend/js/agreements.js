@@ -4,6 +4,7 @@
    population, auto-prefill integrations, and CRUD operations.
 ─────────────────────────────────────────────────────────────────────────── */
 
+window.API_BASE = window.API_BASE || 'http://localhost:5000/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');
