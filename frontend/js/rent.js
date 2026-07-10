@@ -3,11 +3,11 @@
    Handles authorization, API interaction, stats computation, and search/filtering.
 ─────────────────────────────────────────────────────────────────────────── */
 
-window.API_BASE = window.API_BASE || 'http://localhost:5000/api';
+window.API_BASE = window.API_BASE || 'https://staysphere-backend-1lyo.onrender.com/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');
-const user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
+const user = JSON.parse(localStorage.getItem('ss_user') || 'null');
 if (!token || !user) {
   window.location.href = 'index.html';
   throw new Error('Unauthenticated');
@@ -18,32 +18,32 @@ if (user.role !== 'Admin') {
 }
 
 // ── DOM Elements ──────────────────────────────────────────────────────────────
-const adminNameEl     = document.getElementById('admin-name');
-const adminInitialEl  = document.getElementById('admin-initial');
-const greetingEl      = document.getElementById('greeting-text');
-const rentTableBody   = document.getElementById('rent-table-body');
-const emptyState      = document.getElementById('empty-state');
-const recordCountEl   = document.getElementById('record-count');
-const toast           = document.getElementById('toast');
+const adminNameEl = document.getElementById('admin-name');
+const adminInitialEl = document.getElementById('admin-initial');
+const greetingEl = document.getElementById('greeting-text');
+const rentTableBody = document.getElementById('rent-table-body');
+const emptyState = document.getElementById('empty-state');
+const recordCountEl = document.getElementById('record-count');
+const toast = document.getElementById('toast');
 
 // Stats DOM Elements
-const pendingCountEl  = document.getElementById('sc-pending');
-const overdueCountEl  = document.getElementById('sc-overdue');
-const collectedSumEl  = document.getElementById('sc-collected');
+const pendingCountEl = document.getElementById('sc-pending');
+const overdueCountEl = document.getElementById('sc-overdue');
+const collectedSumEl = document.getElementById('sc-collected');
 
 // Search & Filter DOM Elements
-const searchInput     = document.getElementById('search-input');
-const statusFilter    = document.getElementById('status-filter');
-const monthFilter     = document.getElementById('month-filter');
+const searchInput = document.getElementById('search-input');
+const statusFilter = document.getElementById('status-filter');
+const monthFilter = document.getElementById('month-filter');
 
 // ── Topbar Info ──────────────────────────────────────────────────────────────
 if (user) {
   const firstName = user.fullName?.split(' ')[0] || 'Admin';
-  const hour      = new Date().getHours();
-  const greeting  = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  adminNameEl.textContent    = user.fullName || 'Admin';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  adminNameEl.textContent = user.fullName || 'Admin';
   adminInitialEl.textContent = firstName[0].toUpperCase();
-  greetingEl.textContent     = `${greeting}, ${firstName} 👋`;
+  greetingEl.textContent = `${greeting}, ${firstName} 👋`;
 }
 
 // ── Mobile Sidebar Toggle ─────────────────────────────────────────────────────
@@ -121,10 +121,10 @@ async function loadMonthFilter() {
 
     const months = json.data || [];
     const currentValue = monthFilter.value;
-    
+
     monthFilter.innerHTML = '<option value="">All Months</option>' +
       months.map(m => `<option value="${m}">${m}</option>`).join('');
-    
+
     if (months.includes(currentValue)) {
       monthFilter.value = currentValue;
     }
@@ -140,7 +140,7 @@ async function loadTenantsList() {
     if (res.ok) {
       // Filter Active tenants who have roomNumber assigned
       tenantsCache = (json.data || []).filter(t => t.status === 'Active');
-      
+
       const select = document.getElementById('f-tenant');
       select.innerHTML = '<option value="">— Select Tenant —</option>' +
         tenantsCache.map(t => `<option value="${t._id}">${t.fullName} (${t.roomNumber ? 'Room ' + t.roomNumber : 'No Room Assigned'})</option>`).join('');
@@ -180,13 +180,13 @@ async function loadRentRecords() {
 
 function renderRentRecords(records) {
   recordCountEl.textContent = `${records.length} record${records.length === 1 ? '' : 's'}`;
-  
+
   if (!records.length) {
     rentTableBody.innerHTML = '';
     emptyState.style.display = 'block';
     return;
   }
-  
+
   emptyState.style.display = 'none';
 
   rentTableBody.innerHTML = records.map((record, index) => {
@@ -208,8 +208,8 @@ function renderRentRecords(records) {
     }
 
     // Actions depending on status
-    const payButton = record.status !== 'Paid' 
-      ? `<button class="icon-btn pay" title="Mark as Paid" onclick="openPayModal('${record._id}', '${record.tenantName || 'Tenant'}', ${record.amount})">💰</button>` 
+    const payButton = record.status !== 'Paid'
+      ? `<button class="icon-btn pay" title="Mark as Paid" onclick="openPayModal('${record._id}', '${record.tenantName || 'Tenant'}', ${record.amount})">💰</button>`
       : '';
 
     return `
@@ -260,7 +260,7 @@ const inputRemarks = document.getElementById('f-remarks');
 tenantSelect.addEventListener('change', () => {
   const tenantId = tenantSelect.value;
   if (!tenantId) return;
-  
+
   const tenant = tenantsCache.find(t => t._id === tenantId);
   if (tenant) {
     if (tenant.rentAmount) {
@@ -272,11 +272,11 @@ tenantSelect.addEventListener('change', () => {
 // Helper to pre-populate current month/year and a default due date
 function setDefaultsForNewRecord() {
   const today = new Date();
-  
+
   // Format Month Year (e.g. "July 2026")
   const currentMonthStr = today.toLocaleString('en-US', { month: 'long', year: 'numeric' });
   inputRentMonth.value = currentMonthStr;
-  
+
   // Default due date: 5th of current month
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -290,9 +290,9 @@ function openAddModal() {
   statusGroup.style.display = 'none';
   rentModalTitle.textContent = 'Record Rent';
   rentModalSubmit.textContent = 'Save Record';
-  
+
   setDefaultsForNewRecord();
-  
+
   rentModal.classList.add('open');
   tenantSelect.focus();
 }
@@ -305,24 +305,24 @@ async function openEditModal(id) {
 
     const record = json.data;
     inputId.value = record._id;
-    
+
     // In edit mode, hide tenant selection (tenant shouldn't change)
     tenantSelectGroup.style.display = 'none';
     statusGroup.style.display = 'block';
-    
+
     inputAmount.value = record.amount || 0;
     inputRentMonth.value = record.rentMonth || '';
-    
+
     if (record.dueDate) {
       inputDueDate.value = record.dueDate.split('T')[0];
     }
-    
+
     inputStatus.value = record.status || 'Pending';
     inputRemarks.value = record.remarks || '';
-    
+
     rentModalTitle.textContent = 'Edit Rent Record';
     rentModalSubmit.textContent = 'Update Record';
-    
+
     rentModal.classList.add('open');
   } catch (err) {
     showToast(err.message || 'Error fetching invoice data', true);
@@ -340,7 +340,7 @@ rentModal.addEventListener('click', (e) => { if (e.target === rentModal) closeRe
 
 rentForm.addEventListener('submit', async () => {
   const id = inputId.value;
-  
+
   const payload = {
     amount: Number(inputAmount.value),
     rentMonth: inputRentMonth.value.trim(),
@@ -375,7 +375,7 @@ rentForm.addEventListener('submit', async () => {
 
     showToast(id ? 'Rent record updated successfully' : 'Rent invoice recorded successfully');
     closeRentModal();
-    
+
     // Refresh page data
     await loadRentStats();
     await loadMonthFilter();
@@ -408,14 +408,14 @@ function openPayModal(id, tenantName, amount) {
   payForm.reset();
   payRentId.value = id;
   payInvoiceDetails.innerHTML = `Recording payment for <strong>${tenantName}</strong> of amount <strong>${fmtRupees(amount)}</strong>.`;
-  
+
   // Default payment date is today
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
   payDateInput.value = `${yyyy}-${mm}-${dd}`;
-  
+
   payModal.classList.add('open');
   payDateInput.focus();
 }

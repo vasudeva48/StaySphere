@@ -136,7 +136,7 @@ npm run dev
 Backend runs at:
 
 ```
-http://localhost:5000
+const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
 ```
 
 ### Frontend

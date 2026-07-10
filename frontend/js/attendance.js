@@ -4,11 +4,11 @@
    Check-In / Check-Out operations, stats summary, log history, search and filters.
    ─────────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');
-const user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
+const user = JSON.parse(localStorage.getItem('ss_user') || 'null');
 if (!token || !user) {
   window.location.href = 'index.html';
   throw new Error('Unauthenticated');
@@ -19,48 +19,48 @@ if (user.role !== 'Admin') {
 }
 
 // ── DOM Elements ──────────────────────────────────────────────────────────────
-const adminNameEl         = document.getElementById('admin-name');
-const adminInitialEl      = document.getElementById('admin-initial');
-const greetingEl          = document.getElementById('greeting-text');
+const adminNameEl = document.getElementById('admin-name');
+const adminInitialEl = document.getElementById('admin-initial');
+const greetingEl = document.getElementById('greeting-text');
 const attendanceTableBody = document.getElementById('attendance-table-body');
-const emptyState          = document.getElementById('empty-state');
-const recordCountEl       = document.getElementById('record-count');
-const toast               = document.getElementById('toast');
+const emptyState = document.getElementById('empty-state');
+const recordCountEl = document.getElementById('record-count');
+const toast = document.getElementById('toast');
 
 // Stats DOM Elements
-const scCheckinsEl        = document.getElementById('sc-checkins');
-const scCurrentlyInEl     = document.getElementById('sc-currently-in');
-const scCheckoutsEl       = document.getElementById('sc-checkouts');
-const scAbsentEl          = document.getElementById('sc-absent');
+const scCheckinsEl = document.getElementById('sc-checkins');
+const scCurrentlyInEl = document.getElementById('sc-currently-in');
+const scCheckoutsEl = document.getElementById('sc-checkouts');
+const scAbsentEl = document.getElementById('sc-absent');
 
 // Search & Filter DOM Elements
-const searchInput         = document.getElementById('search-input');
-const statusFilter        = document.getElementById('status-filter');
-const dateFilter          = document.getElementById('date-filter');
+const searchInput = document.getElementById('search-input');
+const statusFilter = document.getElementById('status-filter');
+const dateFilter = document.getElementById('date-filter');
 
 // Modals & Forms
-const attendanceModal       = document.getElementById('attendance-modal');
-const attendanceModalTitle  = document.getElementById('attendance-modal-title');
+const attendanceModal = document.getElementById('attendance-modal');
+const attendanceModalTitle = document.getElementById('attendance-modal-title');
 const attendanceModalSubmit = document.getElementById('attendance-modal-submit');
-const attendanceForm        = document.getElementById('attendance-form');
-const deleteModal           = document.getElementById('delete-modal');
+const attendanceForm = document.getElementById('attendance-form');
+const deleteModal = document.getElementById('delete-modal');
 
 // Form Fields
-const actionModeInput       = document.getElementById('attendance-action-mode');
-const recordIdInput         = document.getElementById('attendance-record-id');
-const inputTenant           = document.getElementById('f-tenant');
-const inputRoomNumber       = document.getElementById('f-roomNumber');
-const inputBedNumber         = document.getElementById('f-bedNumber');
-const inputDate             = document.getElementById('f-date');
-const inputStatus           = document.getElementById('f-status');
-const inputRemarks          = document.getElementById('f-remarks');
+const actionModeInput = document.getElementById('attendance-action-mode');
+const recordIdInput = document.getElementById('attendance-record-id');
+const inputTenant = document.getElementById('f-tenant');
+const inputRoomNumber = document.getElementById('f-roomNumber');
+const inputBedNumber = document.getElementById('f-bedNumber');
+const inputDate = document.getElementById('f-date');
+const inputStatus = document.getElementById('f-status');
+const inputRemarks = document.getElementById('f-remarks');
 
-const fStatusGroup          = document.getElementById('f-status-group');
-const formRowExtraOptions   = document.getElementById('form-row-extra-options');
+const fStatusGroup = document.getElementById('f-status-group');
+const formRowExtraOptions = document.getElementById('form-row-extra-options');
 
 // Delete modal fields
-const deleteRecordIdInput   = document.getElementById('delete-record-id');
-const deleteMsgEl           = document.getElementById('delete-msg');
+const deleteRecordIdInput = document.getElementById('delete-record-id');
+const deleteMsgEl = document.getElementById('delete-msg');
 
 // ── Cache arrays ─────────────────────────────────────────────────────────────
 let tenantsCache = [];
@@ -69,11 +69,11 @@ let attendanceLogs = [];
 // ── Topbar Info ──────────────────────────────────────────────────────────────
 if (user) {
   const firstName = user.fullName?.split(' ')[0] || 'Admin';
-  const hour      = new Date().getHours();
-  const greeting  = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  adminNameEl.textContent    = user.fullName || 'Admin';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  adminNameEl.textContent = user.fullName || 'Admin';
   adminInitialEl.textContent = firstName[0].toUpperCase();
-  greetingEl.textContent     = `${greeting}, ${firstName} 👋`;
+  greetingEl.textContent = `${greeting}, ${firstName} 👋`;
 }
 
 // ── Mobile Sidebar Toggle ─────────────────────────────────────────────────────
@@ -162,7 +162,7 @@ inputTenant.addEventListener('change', (e) => {
   const selectedId = e.target.value;
   const tenant = tenantsCache.find(t => t._id === selectedId);
   inputRoomNumber.value = tenant ? (tenant.roomNumber || '') : '';
-  inputBedNumber.value  = tenant ? (tenant.bedNumber || '') : '';
+  inputBedNumber.value = tenant ? (tenant.bedNumber || '') : '';
 });
 
 // 2. Fetch Attendance stats summary
@@ -172,10 +172,10 @@ async function loadStatsSummary() {
     if (res.ok) {
       const json = await res.json();
       const stats = json.data || {};
-      scCheckinsEl.textContent    = stats.checkedIn ?? 0;
+      scCheckinsEl.textContent = stats.checkedIn ?? 0;
       scCurrentlyInEl.textContent = (stats.checkedIn ?? 0) + (stats.present ?? 0);
-      scCheckoutsEl.textContent   = stats.checkedOut ?? 0;
-      scAbsentEl.textContent      = stats.absent ?? 0;
+      scCheckoutsEl.textContent = stats.checkedOut ?? 0;
+      scAbsentEl.textContent = stats.absent ?? 0;
     }
   } catch (err) {
     console.error('Error fetching attendance summary:', err);
@@ -350,8 +350,8 @@ async function openEditModal(id) {
     inputTenant.disabled = true; // Cannot change tenant on existing log
 
     inputRoomNumber.value = record.roomNumber || '';
-    inputBedNumber.value  = record.bedNumber || '';
-    inputRemarks.value    = record.remarks || '';
+    inputBedNumber.value = record.bedNumber || '';
+    inputRemarks.value = record.remarks || '';
 
     // Show date & status
     formRowExtraOptions.style.display = 'grid';

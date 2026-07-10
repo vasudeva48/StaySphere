@@ -4,11 +4,11 @@
    CRUD operations, Check-In/Check-Out flow, and statistics updates.
 ─────────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');
-const user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
+const user = JSON.parse(localStorage.getItem('ss_user') || 'null');
 if (!token || !user) {
   window.location.href = 'index.html';
   throw new Error('Unauthenticated');
@@ -19,41 +19,41 @@ if (user.role !== 'Admin') {
 }
 
 // ── DOM Elements ──────────────────────────────────────────────────────────────
-const adminNameEl         = document.getElementById('admin-name');
-const adminInitialEl      = document.getElementById('admin-initial');
-const greetingEl          = document.getElementById('greeting-text');
-const visitorsTableBody   = document.getElementById('visitors-table-body');
-const emptyState          = document.getElementById('empty-state');
-const recordCountEl       = document.getElementById('record-count');
-const toast               = document.getElementById('toast');
+const adminNameEl = document.getElementById('admin-name');
+const adminInitialEl = document.getElementById('admin-initial');
+const greetingEl = document.getElementById('greeting-text');
+const visitorsTableBody = document.getElementById('visitors-table-body');
+const emptyState = document.getElementById('empty-state');
+const recordCountEl = document.getElementById('record-count');
+const toast = document.getElementById('toast');
 
 // Stats DOM Elements
-const totalCountEl        = document.getElementById('sc-total');
-const checkedInCountEl    = document.getElementById('sc-checkedin');
-const checkedOutCountEl   = document.getElementById('sc-checkedout');
+const totalCountEl = document.getElementById('sc-total');
+const checkedInCountEl = document.getElementById('sc-checkedin');
+const checkedOutCountEl = document.getElementById('sc-checkedout');
 
 // Search & Filter DOM Elements
-const searchInput         = document.getElementById('search-input');
-const statusFilter        = document.getElementById('status-filter');
+const searchInput = document.getElementById('search-input');
+const statusFilter = document.getElementById('status-filter');
 
 // Modals & Forms
-const visitorModal        = document.getElementById('visitor-modal');
-const visitorModalTitle   = document.getElementById('visitor-modal-title');
-const visitorModalSubmit  = document.getElementById('visitor-modal-submit');
-const visitorForm         = document.getElementById('visitor-form');
-const deleteModal         = document.getElementById('delete-modal');
+const visitorModal = document.getElementById('visitor-modal');
+const visitorModalTitle = document.getElementById('visitor-modal-title');
+const visitorModalSubmit = document.getElementById('visitor-modal-submit');
+const visitorForm = document.getElementById('visitor-form');
+const deleteModal = document.getElementById('delete-modal');
 
 // Form Fields
-const inputId             = document.getElementById('visitor-id');
-const inputVisitorName    = document.getElementById('f-visitorName');
-const inputPhoneNumber    = document.getElementById('f-phoneNumber');
-const inputTenant         = document.getElementById('f-tenant');
-const inputRoomNumber     = document.getElementById('f-roomNumber');
-const inputRelationship   = document.getElementById('f-relationship');
-const inputPurpose        = document.getElementById('f-purpose');
-const inputIdProofType    = document.getElementById('f-idProofType');
-const inputIdProofNumber  = document.getElementById('f-idProofNumber');
-const inputRemarks        = document.getElementById('f-remarks');
+const inputId = document.getElementById('visitor-id');
+const inputVisitorName = document.getElementById('f-visitorName');
+const inputPhoneNumber = document.getElementById('f-phoneNumber');
+const inputTenant = document.getElementById('f-tenant');
+const inputRoomNumber = document.getElementById('f-roomNumber');
+const inputRelationship = document.getElementById('f-relationship');
+const inputPurpose = document.getElementById('f-purpose');
+const inputIdProofType = document.getElementById('f-idProofType');
+const inputIdProofNumber = document.getElementById('f-idProofNumber');
+const inputRemarks = document.getElementById('f-remarks');
 
 // ── Cache for Tenants ────────────────────────────────────────────────────────
 let tenantsCache = [];
@@ -62,11 +62,11 @@ let visitorsCache = [];
 // ── Topbar Info ──────────────────────────────────────────────────────────────
 if (user) {
   const firstName = user.fullName?.split(' ')[0] || 'Admin';
-  const hour      = new Date().getHours();
-  const greeting  = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  adminNameEl.textContent    = user.fullName || 'Admin';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  adminNameEl.textContent = user.fullName || 'Admin';
   adminInitialEl.textContent = firstName[0].toUpperCase();
-  greetingEl.textContent     = `${greeting}, ${firstName} 👋`;
+  greetingEl.textContent = `${greeting}, ${firstName} 👋`;
 }
 
 // ── Mobile Sidebar Toggle ─────────────────────────────────────────────────────
@@ -236,7 +236,7 @@ function applyFiltersAndSearch() {
 
   const filtered = visitorsCache.filter(v => {
     // Search filter
-    const matchesSearch = !query || 
+    const matchesSearch = !query ||
       (v.visitorName || '').toLowerCase().includes(query) ||
       (v.tenantName || '').toLowerCase().includes(query) ||
       (v.phoneNumber || '').toLowerCase().includes(query) ||
@@ -329,7 +329,7 @@ window.openEditModal = async (id) => {
     const res = await fetch(`${API_BASE}/visitors/${id}`, { headers: authHeaders() });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message);
-    
+
     const record = json.data;
     if (!record) return;
 

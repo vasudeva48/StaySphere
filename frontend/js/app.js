@@ -1,5 +1,5 @@
 // StaySphere – Homepage Entry Point
-const API_BASE = 'https://staysphere-backend-11yo.onrender.com';
+const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
 
 // ── Homepage auth awareness ───────────────────────────────────────────────────
 // If a valid session exists, swap the nav Sign In / Register links for a

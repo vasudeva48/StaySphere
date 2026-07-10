@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');

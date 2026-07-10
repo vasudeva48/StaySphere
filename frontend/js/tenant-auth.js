@@ -9,10 +9,10 @@
    ⛔  No token at all             → login.html immediately
 ───────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
 
 const _token = localStorage.getItem('ss_token');
-const _user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
+const _user = JSON.parse(localStorage.getItem('ss_user') || 'null');
 
 // Fast path: no token → login now
 if (!_token || !_user) {
@@ -22,27 +22,27 @@ if (!_token || !_user) {
 
 // Expose globals so page scripts can use them
 window.TENANT_TOKEN = _token;
-window.TENANT_USER  = _user;
-window.TENANT_API   = API_BASE;
+window.TENANT_USER = _user;
+window.TENANT_API = API_BASE;
 
 // ── Sidebar / topbar init (runs after DOM is ready) ───────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   // Topbar user info
-  const nameEl    = document.getElementById('tenant-name');
-  const initEl    = document.getElementById('tenant-initial');
-  const greetEl   = document.getElementById('greeting-text');
-  const hour      = new Date().getHours();
+  const nameEl = document.getElementById('tenant-name');
+  const initEl = document.getElementById('tenant-initial');
+  const greetEl = document.getElementById('greeting-text');
+  const hour = new Date().getHours();
   const greetWord = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = _user.fullName?.split(' ')[0] || 'Tenant';
 
-  if (nameEl)  nameEl.textContent  = _user.fullName || 'Tenant';
-  if (initEl)  initEl.textContent  = firstName[0].toUpperCase();
+  if (nameEl) nameEl.textContent = _user.fullName || 'Tenant';
+  if (initEl) initEl.textContent = firstName[0].toUpperCase();
   if (greetEl) greetEl.textContent = `${greetWord}, ${firstName} 👋`;
 
   // Sidebar toggle (mobile)
   const hamburger = document.getElementById('hamburger');
-  const sidebar   = document.getElementById('sidebar');
-  const overlay   = document.getElementById('sidebar-overlay');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
 
   hamburger?.addEventListener('click', () => {
     sidebar?.classList.toggle('open');
