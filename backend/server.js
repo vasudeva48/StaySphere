@@ -26,7 +26,29 @@ connectDB();
 
 // ── Middleware ─────────────────────────────────────────────
 const path = require('path');
-app.use(cors());
+
+// Allow requests from the local dev server and the deployed Vercel frontend
+const allowedOrigins = [
+  'http://localhost:5000',
+  'http://localhost:3000',
+  'http://127.0.0.1:5500',  // VS Code Live Server
+  'http://127.0.0.1:3000',
+];
+// If FRONTEND_URL is set (e.g. https://staysphere.vercel.app), add it too
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, same-origin)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend')));

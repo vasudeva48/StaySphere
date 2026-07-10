@@ -3,7 +3,6 @@
    Reads ss_token and ss_user from localStorage (set on login).
 ─────────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'http://localhost:5000/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');

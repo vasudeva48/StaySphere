@@ -7,7 +7,6 @@
    - Invalid/expired token → clear localStorage and show the register form
 ───────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'http://localhost:5000/api';
 
 // ── Async token validation (runs before showing form) ────────────────────────
 (async () => {
