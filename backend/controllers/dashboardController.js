@@ -5,6 +5,7 @@ const Agreement = require('../models/Agreement');
 const MaintenanceRequest = require('../models/MaintenanceRequest');
 const Visitor = require('../models/Visitor');
 const Expense = require('../models/Expense');
+const Attendance = require('../models/Attendance');
 
 /**
  * @desc    Get Owner Dashboard summary statistics
@@ -76,6 +77,18 @@ const getDashboardStats = async (req, res) => {
     const totalExpenses = totalExpensesAgg[0]?.total || 0;
     const monthlyExpenses = monthlyExpensesAgg[0]?.total || 0;
 
+    // ── Attendance ─────────────────────────────────────────────
+    const [todaysCheckIns, todaysCheckOuts, currentlyPresent] = await Promise.all([
+      Attendance.countDocuments({ checkInTime: { $gte: todayStart, $lte: todayEnd } }),
+      Attendance.countDocuments({ checkOutTime: { $gte: todayStart, $lte: todayEnd } }),
+      Attendance.countDocuments({ status: { $in: ['Present', 'Checked In'] }, date: { $gte: todayStart, $lte: todayEnd } }),
+    ]);
+
+    const recentAttendance = await Attendance.find()
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .select('tenantName roomNumber status checkInTime checkOutTime updatedAt date');
+
     res.status(200).json({
       success: true,
       data: {
@@ -93,6 +106,10 @@ const getDashboardStats = async (req, res) => {
         checkedOutToday,
         monthlyExpenses,
         totalExpenses,
+        todaysCheckIns,
+        todaysCheckOuts,
+        currentlyPresent,
+        recentAttendance,
         admin: {
           name:  req.user.fullName,
           email: req.user.email,

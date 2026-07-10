@@ -73,6 +73,9 @@ const statMap = [
   { id: 'stat-visitors-out',     key: 'checkedOutToday',        label: 'Checked Out Today',         icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false },
   { id: 'stat-monthly-expenses', key: 'monthlyExpenses',        label: 'Current Month Expenses (₹)', icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },
   { id: 'stat-total-expenses',   key: 'totalExpenses',          label: 'Total Expenses (₹)',        icon: '💸', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: true  },
+  { id: 'stat-attendance-in',  key: 'todaysCheckIns',          label: "Today's Check-ins",        icon: '📅', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
+  { id: 'stat-attendance-out', key: 'todaysCheckOuts',         label: "Today's Check-outs",       icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false },
+  { id: 'stat-attendance-pres',key: 'currentlyPresent',        label: "Currently Present Tenants",icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
 ];
 
 
@@ -130,6 +133,7 @@ async function fetchStats() {
     loadRecentMaintenanceRequests();
     loadRecentVisitors();
     loadRecentExpenses();
+    renderRecentAttendance(json.data.recentAttendance || []);
   } catch (err) {
     showToast(err.message || 'Could not reach server', true);
     // Show dashes on failure
@@ -319,6 +323,59 @@ async function loadRecentExpenses() {
     console.error('Error loading expenses list on dashboard:', err);
     listEl.innerHTML = '<div style="text-align:center; color:var(--clr-danger); font-size:0.85rem; padding:1rem 0;">Could not load recent expenses</div>';
   }
+}
+
+// ── Render recent attendance activity ──────────────────────────────────
+function renderRecentAttendance(records) {
+  const listEl = document.getElementById('recent-attendance-list');
+  if (!listEl) return;
+
+  if (!records.length) {
+    listEl.innerHTML = '<div style="text-align:center; color:var(--clr-muted); font-size:0.85rem; padding:1.2rem 0;">No attendance activity logged today.</div>';
+    return;
+  }
+
+  const statusColors = {
+    'Checked In': '#f59e0b',
+    'Checked Out': '#a855f7',
+    'Present': '#22c55e',
+    'Absent': '#ef4444'
+  };
+
+  listEl.innerHTML = records.map(r => {
+    const col = statusColors[r.status] || '#fff';
+    const dateStr = r.date ? new Date(r.date).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit'}) : '';
+    
+    let timeInfo = '';
+    if (r.status === 'Checked In') {
+      timeInfo = r.checkInTime ? 'In: ' + new Date(r.checkInTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+    } else if (r.status === 'Checked Out') {
+      timeInfo = r.checkOutTime ? 'Out: ' + new Date(r.checkOutTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+    } else if (r.status === 'Present') {
+      timeInfo = r.checkInTime ? 'Present at ' + new Date(r.checkInTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'Present';
+    } else {
+      timeInfo = 'Absent';
+    }
+
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.8rem; background:var(--clr-surface-2); border-radius:var(--radius-sm); border:1px solid var(--clr-border);">
+        <div>
+          <div style="font-weight:600; font-size:0.875rem; color:var(--clr-text);">${r.tenantName}</div>
+          <div style="font-size:0.75rem; color:var(--clr-muted); margin-top:0.15rem;">
+            Room ${r.roomNumber || '—'} · Bed ${r.bedNumber || '—'}
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <span style="font-size:0.7rem; font-weight:700; color:${col}; border:1px solid ${col}40; background:${col}10; padding:0.15rem 0.4rem; border-radius:10px; display:inline-block;">
+            ${r.status}
+          </span>
+          <div style="font-size:0.68rem; color:var(--clr-muted); margin-top:0.25rem;">
+            ${dateStr} ${timeInfo ? '· ' + timeInfo : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 // ── Init ──────────────────────────────────────────────────────────────

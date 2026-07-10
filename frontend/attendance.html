@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="StaySphere – Manage visitors, log check-in/out, and view visitor logs." />
-  <title>Visitor Management – StaySphere</title>
+  <meta name="description" content="StaySphere – Manage tenant attendance, logs, and check-ins." />
+  <title>Attendance &amp; Check-In – StaySphere</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/dashboard.css" />
-  <link rel="stylesheet" href="css/visitors.css" />
+  <link rel="stylesheet" href="css/attendance.css" />
 </head>
 <body>
 
@@ -32,8 +32,8 @@
 
       <span class="nav-section-label">Operations</span>
       <a href="maintenance.html" class="nav-item" id="nav-maintenance"><span class="nav-icon">🔧</span> Maintenance</a>
-      <a href="visitors.html" class="nav-item active" id="nav-visitors"><span class="nav-icon">🚪</span> Visitors</a>
-      <a href="attendance.html" class="nav-item" id="nav-attendance"><span class="nav-icon">📅</span> Attendance</a>
+      <a href="visitors.html" class="nav-item" id="nav-visitors"><span class="nav-icon">🚪</span> Visitors</a>
+      <a href="attendance.html" class="nav-item active" id="nav-attendance"><span class="nav-icon">📅</span> Attendance</a>
       <a href="#" class="nav-item" id="nav-notices"><span class="nav-icon">📋</span> Notices</a>
     </nav>
     <div class="sidebar-footer">
@@ -62,60 +62,68 @@
 
     <!-- Content -->
     <main class="content">
-      <h1 class="page-title">Visitor Management</h1>
-      <p class="page-subtitle">Track visitor logs, record check-ins/outs, and maintain host records.</p>
+      <h1 class="page-title">Attendance &amp; Check-In</h1>
+      <p class="page-subtitle">Track daily tenant presence, record check-ins/outs, and manage attendance logs.</p>
 
       <!-- Stats Bar -->
       <div class="stats-bar" id="stats-bar">
-        <div class="stat-chip">🚪 Today's Check-ins <strong id="sc-total">—</strong></div>
-        <div class="stat-chip" style="color:var(--clr-success)">✅ Currently Checked In <strong id="sc-checkedin">—</strong></div>
-        <div class="stat-chip" style="color:var(--clr-primary)">🏃 Checked Out Today <strong id="sc-checkedout">—</strong></div>
+        <div class="stat-chip">📅 Today's Check-ins <strong id="sc-checkins">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-success)">✅ Currently Checked In <strong id="sc-currently-in">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-accent)">🏃 Checked Out Today <strong id="sc-checkouts">—</strong></div>
+        <div class="stat-chip" style="color:var(--clr-muted)">❌ Absent Today <strong id="sc-absent">—</strong></div>
       </div>
 
       <!-- Toolbar -->
       <div class="toolbar">
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" class="search-input" placeholder="Search visitor name, tenant, room or phone..." autocomplete="off" />
+          <input type="text" id="search-input" class="search-input" placeholder="Search by tenant name, room or bed..." autocomplete="off" />
+        </div>
+        <div class="date-filter-wrap" style="position:relative; display:inline-block;">
+          <input type="date" id="date-filter" class="filter-select" aria-label="Filter by date" style="min-width: 150px;" />
         </div>
         <select id="status-filter" class="filter-select" aria-label="Filter by status">
           <option value="All">All Statuses</option>
-          <option value="Registered">Registered</option>
           <option value="Checked In">Checked In</option>
           <option value="Checked Out">Checked Out</option>
+          <option value="Present">Present</option>
+          <option value="Absent">Absent</option>
         </select>
-        <button id="btn-add-visitor" class="btn btn-primary" aria-label="Register new visitor">➕ Add Visitor</button>
+        <button id="btn-checkin-trigger" class="btn btn-primary" aria-label="Tenant Check-In">🚪 Check-In</button>
+        <button id="btn-checkout-trigger" class="btn btn-ghost" style="color:#ef4444; border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.06);" aria-label="Tenant Check-Out">🏃 Check-Out</button>
       </div>
 
       <!-- Table Card -->
       <div class="table-card">
         <div class="table-header-bar">
-          <span class="table-title">🚪 Visitor Logs</span>
-          <span class="record-count-badge" id="record-count">0 logs</span>
+          <span class="table-title">📅 Attendance History</span>
+          <span class="record-count-badge" id="record-count">0 records</span>
         </div>
         <div class="table-wrap">
-          <table id="visitors-table" aria-label="Visitors list">
+          <table id="attendance-table" aria-label="Attendance logs">
             <thead>
               <tr>
                 <th>#</th>
-                <th>Visitor Details</th>
-                <th>Host Tenant &amp; Room</th>
-                <th>Relationship &amp; Purpose</th>
-                <th>Check-In / Out Times</th>
+                <th>Tenant Name</th>
+                <th>Room &amp; Bed</th>
+                <th>Attendance Date</th>
+                <th>Check-In Time</th>
+                <th>Check-Out Time</th>
                 <th>Status</th>
+                <th>Remarks</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="visitors-table-body">
-              <!-- Rendered dynamically by visitors.js -->
+            <tbody id="attendance-table-body">
+              <!-- Rendered dynamically by attendance.js -->
             </tbody>
           </table>
         </div>
 
         <div id="empty-state" class="empty-state" style="display:none;">
-          <div class="empty-icon">🚪</div>
-          <div class="empty-title">No visitor records found</div>
-          <div class="empty-sub">Click "Add Visitor" to register a new visitor log.</div>
+          <div class="empty-icon">📅</div>
+          <div class="empty-title">No attendance records found</div>
+          <div class="empty-sub">Search for another date or record check-in/out to populate logs.</div>
         </div>
       </div>
     </main>
@@ -123,84 +131,62 @@
 
   <!-- ═══════ MODALS ═══════════════════════════════════════════ -->
 
-  <!-- Add/Edit Visitor Modal -->
-  <div class="modal-backdrop" id="visitor-modal">
+  <!-- Log Attendance Modal (Check-in/Check-out Action Modal) -->
+  <div class="modal-backdrop" id="attendance-modal">
     <div class="modal">
       <div class="modal-header">
-        <h2 class="modal-title" id="visitor-modal-title">Register Visitor</h2>
-        <button class="modal-close" id="visitor-modal-close" aria-label="Close modal">&times;</button>
+        <h2 class="modal-title" id="attendance-modal-title">Tenant Check-In</h2>
+        <button class="modal-close" id="attendance-modal-close" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="visitor-form" onsubmit="event.preventDefault();">
-          <input type="hidden" id="visitor-id" />
+        <form id="attendance-form" onsubmit="event.preventDefault();">
+          <input type="hidden" id="attendance-action-mode" value="checkin" />
+          <input type="hidden" id="attendance-record-id" />
 
-          <!-- Form row for Name & Phone -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="f-visitorName">Visitor Name *</label>
-              <input type="text" id="f-visitorName" class="form-control" placeholder="e.g. John Doe" required />
-            </div>
-            <div class="form-group">
-              <label for="f-phoneNumber">Phone Number *</label>
-              <input type="tel" id="f-phoneNumber" class="form-control" placeholder="e.g. +91 9876543210" required />
-            </div>
+          <!-- Tenant Selection & Auto-fill Details -->
+          <div class="form-group">
+            <label for="f-tenant">Tenant *</label>
+            <select id="f-tenant" class="form-select" required>
+              <option value="">— Select Tenant —</option>
+            </select>
           </div>
 
-          <!-- Tenant Selection & Auto-fill Room -->
           <div class="form-row">
-            <div class="form-group">
-              <label for="f-tenant">Host Tenant *</label>
-              <select id="f-tenant" class="form-select" required>
-                <option value="">— Select Tenant —</option>
-              </select>
-            </div>
             <div class="form-group">
               <label for="f-roomNumber">Assigned Room</label>
-              <input type="text" id="f-roomNumber" class="form-control" placeholder="Select tenant first" readonly />
+              <input type="text" id="f-roomNumber" class="form-control" placeholder="Room auto-populated" readonly />
+            </div>
+            <div class="form-group">
+              <label for="f-bedNumber">Assigned Bed</label>
+              <input type="text" id="f-bedNumber" class="form-control" placeholder="Bed auto-populated" readonly />
             </div>
           </div>
 
-          <!-- Relationship & Purpose -->
-          <div class="form-row">
+          <!-- Date & Custom Status -->
+          <div class="form-row" id="form-row-extra-options">
             <div class="form-group">
-              <label for="f-relationship">Relationship *</label>
-              <input type="text" id="f-relationship" class="form-control" placeholder="e.g. Parent, Friend, Brother" required />
+              <label for="f-date">Attendance Date *</label>
+              <input type="date" id="f-date" class="form-control" required />
             </div>
-            <div class="form-group">
-              <label for="f-purpose">Purpose of Visit *</label>
-              <input type="text" id="f-purpose" class="form-control" placeholder="e.g. Deliver food, Weekend stay" required />
-            </div>
-          </div>
-
-          <!-- ID Proof Type & Number -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="f-idProofType">ID Proof Type</label>
-              <select id="f-idProofType" class="form-select">
-                <option value="">— Select ID Type —</option>
-                <option value="Aadhaar">Aadhaar</option>
-                <option value="PAN">PAN</option>
-                <option value="Passport">Passport</option>
-                <option value="Driving License">Driving License</option>
-                <option value="Voter ID">Voter ID</option>
-                <option value="Other">Other</option>
+            <div class="form-group" id="f-status-group">
+              <label for="f-status">Status *</label>
+              <select id="f-status" class="form-select">
+                <option value="Checked In">Checked In</option>
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
               </select>
-            </div>
-            <div class="form-group">
-              <label for="f-idProofNumber">ID Proof Number</label>
-              <input type="text" id="f-idProofNumber" class="form-control" placeholder="e.g. ABCD1234E" />
             </div>
           </div>
 
           <!-- Remarks -->
           <div class="form-group">
             <label for="f-remarks">Remarks</label>
-            <textarea id="f-remarks" class="form-textarea" rows="2" placeholder="Additional notes..."></textarea>
+            <textarea id="f-remarks" class="form-textarea" rows="2" placeholder="e.g. Returned late, Weekend pass..."></textarea>
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-ghost" id="visitor-modal-cancel">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="visitor-modal-submit">Save Visitor</button>
+            <button type="button" class="btn btn-ghost" id="attendance-modal-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="attendance-modal-submit">Submit</button>
           </div>
         </form>
       </div>
@@ -211,10 +197,10 @@
   <div class="modal-backdrop" id="delete-modal">
     <div class="modal" style="max-width: 420px;">
       <div class="modal-header">
-        <h2 class="modal-title">Delete Visitor Record</h2>
+        <h2 class="modal-title">Delete Attendance Record</h2>
       </div>
       <div class="modal-body">
-        <input type="hidden" id="delete-visitor-id" />
+        <input type="hidden" id="delete-record-id" />
         <p id="delete-msg" style="font-size:0.9rem; line-height:1.5; color:var(--clr-text); margin-bottom:1.5rem;"></p>
         <div class="modal-footer" style="margin-top:0;">
           <button class="btn btn-ghost" id="delete-cancel">Cancel</button>
@@ -231,6 +217,6 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/visitors.js"></script>
+  <script src="js/attendance.js"></script>
 </body>
 </html>
