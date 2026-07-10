@@ -6,6 +6,7 @@ const MaintenanceRequest = require('../models/MaintenanceRequest');
 const Visitor = require('../models/Visitor');
 const Expense = require('../models/Expense');
 const Attendance = require('../models/Attendance');
+const Notice = require('../models/Notice');
 
 /**
  * @desc    Get Owner Dashboard summary statistics
@@ -89,6 +90,31 @@ const getDashboardStats = async (req, res) => {
       .limit(5)
       .select('tenantName roomNumber status checkInTime checkOutTime updatedAt date');
 
+    // ── Notices ────────────────────────────────────────────────
+    const nowNotice = new Date();
+    const activeNoticeQuery = {
+      isActive: true,
+      publishDate: { $lte: nowNotice },
+      $or: [
+        { expiryDate: { $exists: false } },
+        { expiryDate: null },
+        { expiryDate: { $gt: nowNotice } }
+      ]
+    };
+
+    const [activeNoticesCount, recentNotices, latestNotice] = await Promise.all([
+      Notice.countDocuments(activeNoticeQuery),
+      Notice.find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate('createdBy', 'fullName')
+        .lean(),
+      Notice.findOne(activeNoticeQuery)
+        .sort({ publishDate: -1 })
+        .populate('createdBy', 'fullName')
+        .lean()
+    ]);
+
     res.status(200).json({
       success: true,
       data: {
@@ -110,6 +136,9 @@ const getDashboardStats = async (req, res) => {
         todaysCheckOuts,
         currentlyPresent,
         recentAttendance,
+        activeNoticesCount,
+        recentNotices,
+        latestNotice,
         admin: {
           name:  req.user.fullName,
           email: req.user.email,

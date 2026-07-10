@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StaySphere Notice Board – publish notices, categories, and target audiences." />
+  <title>Notice Board – StaySphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/visitors.css" />
+  <link rel="stylesheet" href="css/notices.css" />
+</head>
+<body>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">Stay<span>Sphere</span></div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Main</span>
+      <a href="dashboard.html" class="nav-item" id="nav-dashboard"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="tenants.html"   class="nav-item" id="nav-tenants"><span class="nav-icon">👥</span> Tenants</a>
+      <a href="rooms.html"     class="nav-item" id="nav-rooms"><span class="nav-icon">🛏️</span> Rooms</a>
+
+      <span class="nav-section-label">Finance</span>
+      <a href="rent.html" class="nav-item" id="nav-rent"><span class="nav-icon">💳</span> Rent</a>
+      <a href="expenses.html" class="nav-item" id="nav-expenses"><span class="nav-icon">📊</span> Expenses</a>
+      <a href="agreements.html" class="nav-item" id="nav-agreements"><span class="nav-icon">📜</span> Agreements</a>
+
+      <span class="nav-section-label">Operations</span>
+      <a href="maintenance.html" class="nav-item" id="nav-maintenance"><span class="nav-icon">🔧</span> Maintenance</a>
+      <a href="visitors.html" class="nav-item" id="nav-visitors"><span class="nav-icon">🚪</span> Visitors</a>
+      <a href="attendance.html" class="nav-item" id="nav-attendance"><span class="nav-icon">📅</span> Attendance</a>
+      <a href="notices.html" class="nav-item active" id="nav-notices"><span class="nav-icon">📋</span> Notices</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn" aria-label="Logout">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN ════════════════════════════════════════════ -->
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-left">
+          <span class="topbar-greeting" id="greeting-text">Welcome back</span>
+          <span class="topbar-name" id="admin-name">Admin</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge">Admin</span>
+        <div class="avatar" id="admin-initial" aria-label="Admin avatar">A</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h1 class="page-title">Notice Board</h1>
+          <p class="page-subtitle">Publish announcements, updates, maintenance info, and policies.</p>
+        </div>
+        <button class="btn btn-primary" id="btn-add-notice">
+          <span>➕</span> Add Notice
+        </button>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="notices-stats">
+        <div class="notices-stat-card" style="--card-accent:#6c63ff; --icon-bg:rgba(108,99,255,0.12)">
+          <div class="notices-stat-icon">📋</div>
+          <div class="notices-stat-info">
+            <span class="notices-stat-label">Total Notices</span>
+            <span class="notices-stat-value" id="stat-total">0</span>
+          </div>
+        </div>
+        <div class="notices-stat-card" style="--card-accent:#22c55e; --icon-bg:rgba(34,197,94,0.12)">
+          <div class="notices-stat-icon">📢</div>
+          <div class="notices-stat-info">
+            <span class="notices-stat-label">Active Notices</span>
+            <span class="notices-stat-value" id="stat-active">0</span>
+          </div>
+        </div>
+        <div class="notices-stat-card" style="--card-accent:#ef4444; --icon-bg:rgba(239,68,68,0.12)">
+          <div class="notices-stat-icon">⏳</div>
+          <div class="notices-stat-info">
+            <span class="notices-stat-label">Expired / Hidden</span>
+            <span class="notices-stat-value" id="stat-expired">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Filters Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="search-input" placeholder="Search notices by title or category..." />
+        </div>
+        <select class="filter-select" id="filter-category">
+          <option value="All">All Categories</option>
+          <option value="General">General</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Rent">Rent</option>
+          <option value="Emergency">Emergency</option>
+          <option value="Holiday">Holiday</option>
+          <option value="Event">Event</option>
+          <option value="Announcement">Announcement</option>
+        </select>
+        <select class="filter-select" id="filter-audience">
+          <option value="All">All Audiences</option>
+          <option value="All">All (Targeted)</option>
+          <option value="Tenants">Tenants</option>
+          <option value="Staff">Staff</option>
+        </select>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card">
+        <div style="overflow-x:auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Audience</th>
+                <th>Priority</th>
+                <th>Publish Date</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="notices-table-body">
+              <!-- Rendered Dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state" style="display:none; text-align:center; padding:3rem 1.5rem;">
+          <div style="font-size:2.5rem; margin-bottom:1rem;">📢</div>
+          <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:0.4rem;">No Notices Found</h3>
+          <p style="font-size:0.875rem; color:var(--clr-muted);">Try resetting search filters or create a new notice.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════ ADD / EDIT MODAL ═══════════════════════════════ -->
+  <div class="modal-backdrop" id="notice-modal" style="display:none;">
+    <div class="modal" style="max-width:550px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="notice-modal-title">Create Notice</h2>
+        <button class="modal-close" id="notice-modal-close">×</button>
+      </div>
+      <form id="notice-form" class="modal-form">
+        <input type="hidden" id="notice-id" />
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label for="form-title">Notice Title *</label>
+            <input type="text" id="form-title" required placeholder="e.g. Scheduled Power Outage" />
+          </div>
+        </div>
+
+        <div class="form-row" style="display:flex; gap:1rem;">
+          <div class="form-group" style="flex:1;">
+            <label for="form-category">Category *</label>
+            <select id="form-category" required>
+              <option value="General">General</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Rent">Rent</option>
+              <option value="Emergency">Emergency</option>
+              <option value="Holiday">Holiday</option>
+              <option value="Event">Event</option>
+              <option value="Announcement">Announcement</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="form-priority">Priority *</label>
+            <select id="form-priority" required>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="display:flex; gap:1rem;">
+          <div class="form-group" style="flex:1;">
+            <label for="form-audience">Audience *</label>
+            <select id="form-audience" required>
+              <option value="All">All</option>
+              <option value="Tenants">Tenants</option>
+              <option value="Staff">Staff</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1; display:flex; align-items:center; margin-top:1.4rem;">
+            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+              <input type="checkbox" id="form-isActive" checked style="width:auto; cursor:pointer;" />
+              Is Notice Active
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row" style="display:flex; gap:1rem;">
+          <div class="form-group" style="flex:1;">
+            <label for="form-publishDate">Publish Date *</label>
+            <input type="date" id="form-publishDate" required />
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="form-expiryDate">Expiry Date (Optional)</label>
+            <input type="date" id="form-expiryDate" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="form-description">Notice Content / Description *</label>
+          <textarea id="form-description" required rows="4" placeholder="Type notice content here..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="notice-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="notice-modal-submit">Publish Notice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════ DELETE CONFIRMATION MODAL ══════════════════════ -->
+  <div class="modal-backdrop" id="delete-modal" style="display:none;">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Notice</h2>
+        <button class="modal-close" id="delete-modal-close">×</button>
+      </div>
+      <div style="padding:1rem 1.5rem; font-size:0.9rem; color:var(--clr-muted); line-height:1.5;">
+        Are you sure you want to permanently delete this notice? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="delete-modal-cancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="delete-modal-confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast Notification ── -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span>ℹ️</span>
+    <span class="toast-msg"></span>
+  </div>
+
+  <script src="js/notices.js"></script>
+</body>
+</html>

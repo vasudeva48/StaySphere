@@ -15,6 +15,7 @@ const maintenanceRoutes = require('./routes/maintenanceRoutes');
 const visitorRoutes     = require('./routes/visitorRoutes');
 const expenseRoutes     = require('./routes/expenseRoutes');
 const attendanceRoutes  = require('./routes/attendanceRoutes');
+const noticeRoutes      = require('./routes/noticeRoutes');
 
 
 const app  = express();
@@ -40,6 +41,7 @@ app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/visitors',   visitorRoutes);
 app.use('/api/expenses',   expenseRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/notices',    noticeRoutes);
 
 // ── Start Server ───────────────────────────────────────────
 app.listen(PORT, () => {

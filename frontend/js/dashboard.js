@@ -76,6 +76,7 @@ const statMap = [
   { id: 'stat-attendance-in',  key: 'todaysCheckIns',          label: "Today's Check-ins",        icon: '📅', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
   { id: 'stat-attendance-out', key: 'todaysCheckOuts',         label: "Today's Check-outs",       icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false },
   { id: 'stat-attendance-pres',key: 'currentlyPresent',        label: "Currently Present Tenants",icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
+  { id: 'stat-active-notices', key: 'activeNoticesCount',       label: "Total Active Notices",     icon: '📢', accent: '#6c63ff', iconBg: 'rgba(108,99,255,0.12)', rupees: false },
 ];
 
 
@@ -134,6 +135,8 @@ async function fetchStats() {
     loadRecentVisitors();
     loadRecentExpenses();
     renderRecentAttendance(json.data.recentAttendance || []);
+    renderRecentNotices(json.data.recentNotices || []);
+    renderLatestNotice(json.data.latestNotice || null);
   } catch (err) {
     showToast(err.message || 'Could not reach server', true);
     // Show dashes on failure
@@ -376,6 +379,80 @@ function renderRecentAttendance(records) {
       </div>
     `;
   }).join('');
+}
+
+function renderRecentNotices(notices) {
+  const listEl = document.getElementById('recent-notices-list');
+  if (!listEl) return;
+
+  if (notices.length === 0) {
+    listEl.innerHTML = '<div style="color:var(--clr-muted); font-size:0.875rem; text-align:center; padding:1rem;">No recent notice activity</div>';
+    return;
+  }
+
+  listEl.innerHTML = notices.map(n => {
+    const pubDate = n.publishDate ? new Date(n.publishDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '—';
+    const isExpired = n.expiryDate && new Date(n.expiryDate) < new Date();
+    const statusText = !n.isActive ? 'Inactive' : (isExpired ? 'Expired' : 'Active');
+    const statusColor = statusText === 'Active' ? 'var(--clr-success)' : 'var(--clr-danger)';
+    
+    const prioColor = n.priority === 'High' ? 'var(--clr-danger)' : (n.priority === 'Medium' ? 'var(--clr-warning)' : 'var(--clr-accent)');
+
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.8rem; background:var(--clr-surface-2); border-radius:var(--radius-sm); border:1px solid var(--clr-border);">
+        <div>
+          <div style="font-weight:600; font-size:0.875rem; color:var(--clr-text);">${n.title}</div>
+          <div style="font-size:0.75rem; color:var(--clr-muted); margin-top:0.15rem;">
+            ${n.category} · Audience: ${n.audience}
+          </div>
+        </div>
+        <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
+          <span style="font-size:0.68rem; font-weight:700; color:${prioColor}; border:1px solid ${prioColor}40; background:${prioColor}10; padding:0.15rem 0.4rem; border-radius:10px; display:inline-block;">
+            ${n.priority}
+          </span>
+          <div style="font-size:0.68rem; color:var(--clr-muted);">
+            Published: ${pubDate} · <span style="color:${statusColor}; font-weight:600;">${statusText}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderLatestNotice(notice) {
+  const bodyEl = document.getElementById('latest-notice-body');
+  if (!bodyEl) return;
+
+  if (!notice) {
+    bodyEl.innerHTML = '<div style="color:var(--clr-muted); font-size:0.875rem; text-align:center; padding:1rem;">No active notices published</div>';
+    return;
+  }
+
+  const pubDate = notice.publishDate ? new Date(notice.publishDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
+  const expDate = notice.expiryDate ? new Date(notice.expiryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Never';
+  const creator = notice.createdBy?.fullName || 'Admin';
+
+  const prioColor = notice.priority === 'High' ? 'var(--clr-danger)' : (notice.priority === 'Medium' ? 'var(--clr-warning)' : 'var(--clr-accent)');
+
+  bodyEl.innerHTML = `
+    <div style="padding:1rem; background:var(--clr-surface-2); border-radius:var(--radius-sm); border:1px solid var(--clr-border); display:flex; flex-direction:column; gap:0.6rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.75rem; font-weight:700; background:rgba(0,212,255,0.12); color:var(--clr-accent); padding:0.2rem 0.6rem; border-radius:8px; border:1px solid rgba(0,212,255,0.25);">
+          ${notice.category}
+        </span>
+        <span style="font-size:0.75rem; font-weight:700; color:${prioColor}; border:1px solid ${prioColor}40; background:${prioColor}10; padding:0.2rem 0.6rem; border-radius:8px;">
+          ${notice.priority} Priority
+        </span>
+      </div>
+      <h3 style="font-size:1.05rem; font-weight:700; color:var(--clr-text); margin-top:0.2rem;">${notice.title}</h3>
+      <p style="font-size:0.85rem; color:var(--clr-muted); line-height:1.5; white-space:pre-wrap;">${notice.description}</p>
+      <div style="border-top:1px solid var(--clr-border); margin-top:0.4rem; padding-top:0.6rem; font-size:0.72rem; color:var(--clr-muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.4rem;">
+        <div>Published by: <strong>${creator}</strong></div>
+        <div>Date: <strong>${pubDate}</strong></div>
+        <div>Expires: <strong>${expDate}</strong></div>
+      </div>
+    </div>
+  `;
 }
 
 // ── Init ──────────────────────────────────────────────────────────────
