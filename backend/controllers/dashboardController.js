@@ -4,6 +4,7 @@ const Rent   = require('../models/Rent');
 const Agreement = require('../models/Agreement');
 const MaintenanceRequest = require('../models/MaintenanceRequest');
 const Visitor = require('../models/Visitor');
+const Expense = require('../models/Expense');
 
 /**
  * @desc    Get Owner Dashboard summary statistics
@@ -62,8 +63,18 @@ const getDashboardStats = async (req, res) => {
     ]);
 
     // ── Expenses ──────────────────────────────────────────────
-    // TODO: replace with Expense aggregate sum for current month
-    const monthlyExpenses = 0;
+    const [totalExpensesAgg, monthlyExpensesAgg] = await Promise.all([
+      Expense.aggregate([
+        { $group: { _id: null, total: { $sum: '$amount' } } }
+      ]),
+      Expense.aggregate([
+        { $match: { expenseDate: { $gte: monthStart, $lte: monthEnd } } },
+        { $group: { _id: null, total: { $sum: '$amount' } } }
+      ])
+    ]);
+
+    const totalExpenses = totalExpensesAgg[0]?.total || 0;
+    const monthlyExpenses = monthlyExpensesAgg[0]?.total || 0;
 
     res.status(200).json({
       success: true,
@@ -81,6 +92,7 @@ const getDashboardStats = async (req, res) => {
         currentlyCheckedIn,
         checkedOutToday,
         monthlyExpenses,
+        totalExpenses,
         admin: {
           name:  req.user.fullName,
           email: req.user.email,

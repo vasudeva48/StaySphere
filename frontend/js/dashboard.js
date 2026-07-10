@@ -71,7 +71,8 @@ const statMap = [
   { id: 'stat-visitors',         key: 'todaysVisitorCheckIns',  label: "Today's Visitors",          icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
   { id: 'stat-visitors-in',      key: 'currentlyCheckedIn',     label: 'Currently Checked In',      icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
   { id: 'stat-visitors-out',     key: 'checkedOutToday',        label: 'Checked Out Today',         icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false },
-  { id: 'stat-expenses',         key: 'monthlyExpenses',        label: 'Monthly Expenses (₹)',      icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },
+  { id: 'stat-monthly-expenses', key: 'monthlyExpenses',        label: 'Current Month Expenses (₹)', icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },
+  { id: 'stat-total-expenses',   key: 'totalExpenses',          label: 'Total Expenses (₹)',        icon: '💸', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: true  },
 ];
 
 
@@ -128,6 +129,7 @@ async function fetchStats() {
     loadRecentPendingRent();
     loadRecentMaintenanceRequests();
     loadRecentVisitors();
+    loadRecentExpenses();
   } catch (err) {
     showToast(err.message || 'Could not reach server', true);
     // Show dashes on failure
@@ -275,6 +277,47 @@ async function loadRecentVisitors() {
   } catch (err) {
     console.error('Error loading visitors:', err);
     listEl.innerHTML = '<div style="text-align:center; color:var(--clr-danger); font-size:0.85rem; padding:1rem 0;">Could not load visitor data</div>';
+  }
+}
+
+// ── Fetch and display recent operations expenses ──────────────────────
+async function loadRecentExpenses() {
+  const listEl = document.getElementById('recent-expenses-list');
+  if (!listEl) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/expenses?limit=3`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message);
+
+    const records = (json.data || []).slice(0, 3);
+    if (!records.length) {
+      listEl.innerHTML = '<div style="text-align:center; color:var(--clr-muted); font-size:0.85rem; padding:1.5rem 0;">🎉 No operations expenses logged yet!</div>';
+      return;
+    }
+
+    listEl.innerHTML = records.map(r => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.8rem; background:var(--clr-surface-2); border-radius:var(--radius-sm); border:1px solid var(--clr-border);">
+        <div>
+          <div style="font-weight:600; font-size:0.875rem; color:var(--clr-text);">${r.expenseTitle || 'Expense'}</div>
+          <div style="font-size:0.75rem; color:var(--clr-muted); margin-top:0.15rem;">
+            ${r.category} · ${r.paymentMethod}
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:700; color:var(--clr-danger); font-size:0.875rem;">₹${(r.amount || 0).toLocaleString('en-IN')}</div>
+          <div style="font-size:0.7rem; color:var(--clr-muted); margin-top:0.15rem;">
+            ${r.expenseDate ? new Date(r.expenseDate).toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit'}) : '—'}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error('Error loading expenses list on dashboard:', err);
+    listEl.innerHTML = '<div style="text-align:center; color:var(--clr-danger); font-size:0.85rem; padding:1rem 0;">Could not load recent expenses</div>';
   }
 }
 
