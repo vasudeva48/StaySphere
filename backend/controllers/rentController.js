@@ -1,5 +1,7 @@
 const Rent   = require('../models/Rent');
 const Tenant = require('../models/Tenant');
+const Room   = require('../models/Room');
+const mongoose = require('mongoose');
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 const fmtMonth = (d) =>
@@ -23,15 +25,32 @@ const createRent = async (req, res) => {
 
   try {
     // Verify tenant exists and pull denormalised fields
-    const tenantDoc = await Tenant.findById(tenant);
+    let tenantDoc;
+    if (mongoose.Types.ObjectId.isValid(tenant)) {
+      tenantDoc = await Tenant.findById(tenant);
+    }
+    if (!tenantDoc) {
+      tenantDoc = await Tenant.findOne({ email: tenant.toString().toLowerCase() });
+    }
+    if (!tenantDoc) {
+      tenantDoc = await Tenant.findOne({ fullName: { $regex: new RegExp(`^${tenant.toString().trim()}$`, 'i') } });
+    }
     if (!tenantDoc) {
       return res.status(404).json({ success: false, message: 'Tenant not found' });
     }
 
+    let resolvedRoomNumber = tenantDoc.roomNumber || '';
+    if (resolvedRoomNumber) {
+      const roomDoc = await Room.findOne({ roomNumber: { $regex: new RegExp(`^${resolvedRoomNumber.trim()}$`, 'i') } });
+      if (roomDoc) {
+        resolvedRoomNumber = roomDoc.roomNumber;
+      }
+    }
+
     const rent = await Rent.create({
-      tenant,
+      tenant: tenantDoc._id,
       tenantName:    tenantDoc.fullName,
-      roomNumber:    tenantDoc.roomNumber || '',
+      roomNumber:    resolvedRoomNumber,
       amount,
       dueDate,
       paymentMethod: paymentMethod || 'Cash',

@@ -4,7 +4,7 @@
    dynamic dropdown pre-fills, and CRUD API calls.
 ─────────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'http://localhost:5000/api';
+window.API_BASE = window.API_BASE || 'http://localhost:5000/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');
@@ -12,6 +12,10 @@ const user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
 if (!token || !user) {
   window.location.href = 'index.html';
   throw new Error('Unauthenticated');
+}
+if (user.role !== 'Admin') {
+  window.location.href = 'tenant-dashboard.html';
+  throw new Error('Unauthorised');
 }
 
 // ── DOM Elements ──────────────────────────────────────────────────────────────
@@ -260,7 +264,7 @@ if (tenantSelect) {
 
     const tenant = tenantsCache.find(t => t._id === tenantId);
     if (tenant && tenant.roomNumber) {
-      const room = roomsCache.find(r => String(r.roomNumber) === String(tenant.roomNumber));
+      const room = roomsCache.find(r => String(r.roomNumber).trim().toLowerCase() === String(tenant.roomNumber).trim().toLowerCase());
       if (room) {
         roomSelect.value = room._id;
       }
@@ -527,6 +531,11 @@ priorityFilter.addEventListener('change', loadRequests);
 //  INITIALIZATION
 // ═══════════════════════════════════════════════════════════════════════════════
 async function init() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryStatus = urlParams.get('status');
+  if (queryStatus) {
+    statusFilter.value = queryStatus;
+  }
   await Promise.all([
     loadAdminSelections(),
     loadRequests()

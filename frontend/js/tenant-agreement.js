@@ -51,7 +51,7 @@ function renderAgreements(agreements) {
       : '';
 
     const roomInfo = a.room
-      ? `Room ${a.room.roomNumber} · ${a.room.roomType} · Floor ${a.room.floorNumber}`
+      ? `Room ${a.room.roomNumber} · ${a.room.roomType}${a.room.floorNumber ? ` · Floor ${a.room.floorNumber}` : ''}`
       : '—';
 
     const docLink = a.agreementFile

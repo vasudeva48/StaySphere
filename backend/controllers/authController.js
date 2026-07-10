@@ -48,6 +48,21 @@ const registerUser = async (req, res) => {
       phoneNumber,
     });
 
+    // If the registered user is a Tenant, ensure a Tenant profile exists
+    if (role === 'Tenant') {
+      const Tenant = require('../models/Tenant');
+      const existingTenant = await Tenant.findOne({ email: email.toLowerCase() });
+      if (!existingTenant) {
+        await Tenant.create({
+          fullName,
+          email: email.toLowerCase(),
+          phoneNumber,
+          gender: 'Other',
+          status: 'Active',
+        });
+      }
+    }
+
     // ── 5. Issue JWT ──────────────────────────────────────
     const token = generateToken(user._id, user.role);
 

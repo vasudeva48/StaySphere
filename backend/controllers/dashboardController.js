@@ -27,8 +27,8 @@ const getDashboardStats = async (req, res) => {
     // ── Rooms ─────────────────────────────────────────────────
     const [totalRooms, occupiedRooms, vacantRooms] = await Promise.all([
       Room.countDocuments(),
-      Room.countDocuments({ status: 'Full' }),
-      Room.countDocuments({ status: 'Available' }),
+      Room.countDocuments({ occupiedBeds: { $gt: 0 } }),
+      Room.countDocuments({ occupiedBeds: 0 }),
     ]);
 
     // ── Rent ──────────────────────────────────────────────────
@@ -79,11 +79,27 @@ const getDashboardStats = async (req, res) => {
     const monthlyExpenses = monthlyExpensesAgg[0]?.total || 0;
 
     // ── Attendance ─────────────────────────────────────────────
-    const [todaysCheckIns, todaysCheckOuts, currentlyPresent] = await Promise.all([
+    const [todaysCheckIns, todaysCheckOuts] = await Promise.all([
       Attendance.countDocuments({ checkInTime: { $gte: todayStart, $lte: todayEnd } }),
       Attendance.countDocuments({ checkOutTime: { $gte: todayStart, $lte: todayEnd } }),
-      Attendance.countDocuments({ status: { $in: ['Present', 'Checked In'] }, date: { $gte: todayStart, $lte: todayEnd } }),
     ]);
+
+    const activeTenants = await Tenant.find({ status: 'Active' }).select('_id');
+    const tenantIds = activeTenants.map(t => t._id);
+
+    const latestAttendanceAgg = await Attendance.aggregate([
+      { $match: { tenant: { $in: tenantIds } } },
+      { $sort: { date: -1, createdAt: -1 } },
+      { $group: {
+          _id: '$tenant',
+          latestStatus: { $first: '$status' }
+        }
+      }
+    ]);
+
+    const currentlyPresent = latestAttendanceAgg.filter(r => 
+      ['Present', 'Checked In'].includes(r.latestStatus)
+    ).length;
 
     const recentAttendance = await Attendance.find()
       .sort({ updatedAt: -1 })

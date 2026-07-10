@@ -8,6 +8,17 @@ const roomSchema = new mongoose.Schema(
       required: [true, 'Room number is required'],
       unique: true,
       trim: true,
+      validate: {
+        validator: async function (value) {
+          const Room = this.constructor || mongoose.model('Room');
+          const existing = await Room.findOne({
+            roomNumber: { $regex: new RegExp(`^${value.trim()}$`, 'i') },
+            _id: { $ne: this._id }
+          });
+          return !existing;
+        },
+        message: 'Room number already exists'
+      }
     },
 
     roomType: {

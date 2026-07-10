@@ -1,5 +1,6 @@
 const Room   = require('../models/Room');
 const Tenant = require('../models/Tenant');
+const { syncTenantRoom, handleRoomNumberChange } = require('./syncHelper');
 
 // ── Helper: auto-compute status ──────────────────────────────────────────────
 const syncStatus = (room) => {
@@ -25,7 +26,7 @@ const createRoom = async (req, res) => {
   }
 
   try {
-    const existing = await Room.findOne({ roomNumber: roomNumber.trim() });
+    const existing = await Room.findOne({ roomNumber: { $regex: new RegExp(`^${roomNumber.trim()}$`, 'i') } });
     if (existing) {
       return res.status(409).json({ success: false, message: `Room ${roomNumber} already exists` });
     }
@@ -67,7 +68,15 @@ const getAllRooms = async (req, res) => {
       const re = new RegExp(search, 'i');
       query.$or = [{ roomNumber: re }, { floorNumber: re }, { roomType: re }];
     }
-    if (status   && ['Available', 'Full', 'Maintenance'].includes(status))   query.status   = status;
+    if (status) {
+      if (status === 'Vacant') {
+        query.occupiedBeds = 0;
+      } else if (status === 'Occupied') {
+        query.occupiedBeds = { $gt: 0 };
+      } else if (['Available', 'Full', 'Maintenance'].includes(status)) {
+        query.status = status;
+      }
+    }
     if (roomType && ['Single', 'Double', 'Triple', 'Dormitory'].includes(roomType)) query.roomType = roomType;
 
     const rooms = await Room.find(query)
@@ -113,7 +122,17 @@ const updateRoom = async (req, res) => {
 
     const { roomNumber, roomType, floorNumber, monthlyRent, description, status, totalBeds } = req.body;
 
-    if (roomNumber !== undefined) room.roomNumber  = roomNumber;
+    const oldRoomNumber = room.roomNumber;
+    let roomNumberChanged = false;
+
+    if (roomNumber !== undefined && roomNumber.trim().toLowerCase() !== oldRoomNumber.trim().toLowerCase()) {
+      const existing = await Room.findOne({ roomNumber: { $regex: new RegExp(`^${roomNumber.trim()}$`, 'i') } });
+      if (existing && existing._id.toString() !== room._id.toString()) {
+        return res.status(409).json({ success: false, message: `Room ${roomNumber} already exists` });
+      }
+      room.roomNumber = roomNumber.trim();
+      roomNumberChanged = true;
+    }
     if (roomType   !== undefined) room.roomType    = roomType;
     if (floorNumber!== undefined) room.floorNumber = floorNumber;
     if (monthlyRent!== undefined) room.monthlyRent = monthlyRent;
@@ -148,6 +167,10 @@ const updateRoom = async (req, res) => {
     if (status !== undefined) room.status = status;
 
     await room.save(); // pre-save hook re-syncs availableBeds + status
+
+    if (roomNumberChanged) {
+      await handleRoomNumberChange(oldRoomNumber, room.roomNumber);
+    }
 
     await room.populate('beds.tenantId', 'fullName phoneNumber');
     res.status(200).json({ success: true, message: 'Room updated successfully', data: room });
@@ -247,6 +270,9 @@ const assignTenant = async (req, res) => {
     tenant.rentAmount = room.monthlyRent || tenant.rentAmount;
     await tenant.save();
 
+    // Sync across other modules
+    await syncTenantRoom(tenant, undefined, undefined);
+
     await room.populate('beds.tenantId', 'fullName phoneNumber email');
     res.status(200).json({
       success: true,
@@ -291,6 +317,9 @@ const unassignTenant = async (req, res) => {
       });
     }
 
+    const oldRoomNumber = room.roomNumber;
+    const oldBedLabel = bed.bedLabel;
+
     // Unassign
     bed.tenantId   = null;
     bed.isOccupied = false;
@@ -301,6 +330,9 @@ const unassignTenant = async (req, res) => {
     tenant.roomNumber = undefined;
     tenant.bedNumber  = undefined;
     await tenant.save();
+
+    // Sync across other modules
+    await syncTenantRoom(tenant, oldRoomNumber, oldBedLabel);
 
     await room.populate('beds.tenantId', 'fullName phoneNumber email');
     res.status(200).json({

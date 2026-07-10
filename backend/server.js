@@ -25,9 +25,11 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // ── Middleware ─────────────────────────────────────────────
+const path = require('path');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ── Routes ─────────────────────────────────────────────────
 app.use('/',              indexRoutes);

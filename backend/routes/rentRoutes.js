@@ -24,7 +24,7 @@ router.get('/my', protect, async (req, res) => {
     if (!tenantDoc) {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
-    const records = await Rent.find({ tenant: tenantDoc._id }).sort({ dueDate: -1 });
+    const records = await Rent.find({ tenant: tenantDoc._id }).sort({ dueDate: 1 });
     res.status(200).json({ success: true, count: records.length, data: records });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message || 'Server error' });

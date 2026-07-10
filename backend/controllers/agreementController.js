@@ -1,6 +1,7 @@
 const Agreement = require('../models/Agreement');
 const Tenant = require('../models/Tenant');
 const Room = require('../models/Room');
+const mongoose = require('mongoose');
 
 /**
  * @desc    Create a new digital agreement
@@ -30,13 +31,28 @@ const createAgreement = async (req, res) => {
 
   try {
     // 1. Verify tenant exists
-    const tenantDoc = await Tenant.findById(tenant);
+    let tenantDoc;
+    if (mongoose.Types.ObjectId.isValid(tenant)) {
+      tenantDoc = await Tenant.findById(tenant);
+    }
+    if (!tenantDoc) {
+      tenantDoc = await Tenant.findOne({ email: tenant.toString().toLowerCase() });
+    }
+    if (!tenantDoc) {
+      tenantDoc = await Tenant.findOne({ fullName: { $regex: new RegExp(`^${tenant.toString().trim()}$`, 'i') } });
+    }
     if (!tenantDoc) {
       return res.status(404).json({ success: false, message: 'Tenant not found' });
     }
 
     // 2. Verify room exists
-    const roomDoc = await Room.findById(room);
+    let roomDoc;
+    if (mongoose.Types.ObjectId.isValid(room)) {
+      roomDoc = await Room.findById(room);
+    }
+    if (!roomDoc) {
+      roomDoc = await Room.findOne({ roomNumber: { $regex: new RegExp(`^${room.toString().trim()}$`, 'i') } });
+    }
     if (!roomDoc) {
       return res.status(404).json({ success: false, message: 'Room not found' });
     }
@@ -51,8 +67,8 @@ const createAgreement = async (req, res) => {
     }
 
     const agreement = await Agreement.create({
-      tenant,
-      room,
+      tenant: tenantDoc._id,
+      room: roomDoc._id,
       agreementNumber: agreementNumber.trim(),
       startDate,
       endDate,

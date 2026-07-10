@@ -318,33 +318,46 @@ const getAttendanceSummary = async (req, res) => {
     const { start, end } = getDayRange();
 
     const [
-      totalCheckedIn,
-      totalCheckedOut,
-      totalPresent,
-      totalAbsent,
+      todaysCheckIns,
+      todaysCheckOuts,
+      todaysAbsents,
       totalActiveTenants,
     ] = await Promise.all([
-      Attendance.countDocuments({ date: { $gte: start, $lte: end }, status: 'Checked In' }),
-      Attendance.countDocuments({ date: { $gte: start, $lte: end }, status: 'Checked Out' }),
-      Attendance.countDocuments({ date: { $gte: start, $lte: end }, status: 'Present' }),
+      Attendance.countDocuments({ checkInTime: { $gte: start, $lte: end } }),
+      Attendance.countDocuments({ checkOutTime: { $gte: start, $lte: end } }),
       Attendance.countDocuments({ date: { $gte: start, $lte: end }, status: 'Absent' }),
       Tenant.countDocuments({ status: 'Active' }),
     ]);
 
-    // Active tenants today that haven't checked in yet or don't have records can be counted
-    const totalRecorded = await Attendance.countDocuments({ date: { $gte: start, $lte: end } });
-    const pendingCheckIn = Math.max(0, totalActiveTenants - totalRecorded);
+    const activeTenants = await Tenant.find({ status: 'Active' }).select('_id');
+    const tenantIds = activeTenants.map(t => t._id);
+
+    const latestAttendanceAgg = await Attendance.aggregate([
+      { $match: { tenant: { $in: tenantIds } } },
+      { $sort: { date: -1, createdAt: -1 } },
+      { $group: {
+          _id: '$tenant',
+          latestStatus: { $first: '$status' }
+        }
+      }
+    ]);
+
+    const currentlyCheckedIn = latestAttendanceAgg.filter(r => 
+      ['Present', 'Checked In'].includes(r.latestStatus)
+    ).length;
+
+    const currentlyCheckedOut = tenantIds.length - currentlyCheckedIn;
 
     res.status(200).json({
       success: true,
       data: {
-        checkedIn: totalCheckedIn,
-        checkedOut: totalCheckedOut,
-        present: totalPresent,
-        absent: totalAbsent,
-        pending: pendingCheckIn,
+        checkedIn: todaysCheckIns,
+        checkedOut: todaysCheckOuts,
+        currentlyCheckedIn,
+        currentlyCheckedOut,
+        currentlyPresent: currentlyCheckedIn,
+        absent: todaysAbsents,
         totalActiveTenants,
-        todayTotalRecords: totalRecorded,
       },
     });
   } catch (error) {

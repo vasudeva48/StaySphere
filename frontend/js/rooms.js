@@ -9,6 +9,7 @@ const API_BASE = 'http://localhost:5000/api';
 const token = localStorage.getItem('ss_token');
 const user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
 if (!token || !user) { window.location.href = 'index.html'; throw new Error('Unauthenticated'); }
+if (user.role !== 'Admin') { window.location.href = 'tenant-dashboard.html'; throw new Error('Unauthorised'); }
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const adminNameEl    = document.getElementById('admin-name');
@@ -428,4 +429,9 @@ document.getElementById('type-filter').addEventListener('change', loadRooms);
 document.getElementById('status-filter').addEventListener('change', loadRooms);
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const queryStatus = urlParams.get('status');
+if (queryStatus) {
+  document.getElementById('status-filter').value = queryStatus;
+}
 loadRooms();

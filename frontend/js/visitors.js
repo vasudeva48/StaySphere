@@ -13,6 +13,10 @@ if (!token || !user) {
   window.location.href = 'index.html';
   throw new Error('Unauthenticated');
 }
+if (user.role !== 'Admin') {
+  window.location.href = 'tenant-dashboard.html';
+  throw new Error('Unauthorised');
+}
 
 // ── DOM Elements ──────────────────────────────────────────────────────────────
 const adminNameEl         = document.getElementById('admin-name');

@@ -50,7 +50,7 @@ async function loadRequests() {
     if (!res.ok) throw new Error(json.message || 'Failed to load');
     allRequests = json.data || [];
     updateStats();
-    renderTable(allRequests);
+    applyFilters();
   } catch (err) {
     showTenantToast(err.message || 'Could not load requests', true);
     renderTable([]);
@@ -109,7 +109,7 @@ function applyFilters() {
 
   const filtered = allRequests.filter(r => {
     const matchSearch = !q || r.requestTitle.toLowerCase().includes(q) || r.description?.toLowerCase().includes(q);
-    const matchStatus = st === 'All' || r.status === st;
+    const matchStatus = st === 'All' || (st === 'Open' ? (r.status === 'Pending' || r.status === 'In Progress') : r.status === st);
     const matchCat    = cat === 'All' || r.category === cat;
     return matchSearch && matchStatus && matchCat;
   });
@@ -237,4 +237,9 @@ document.getElementById('delete-confirm').addEventListener('click', async () => 
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const queryStatus = urlParams.get('status');
+if (queryStatus) {
+  statusFilter.value = queryStatus;
+}
 loadRequests();

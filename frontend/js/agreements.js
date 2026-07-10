@@ -4,7 +4,7 @@
    population, auto-prefill integrations, and CRUD operations.
 ─────────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'http://localhost:5000/api';
+window.API_BASE = window.API_BASE || 'http://localhost:5000/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');
@@ -12,6 +12,10 @@ const user  = JSON.parse(localStorage.getItem('ss_user') || 'null');
 if (!token || !user) {
   window.location.href = 'index.html';
   throw new Error('Unauthenticated');
+}
+if (user.role !== 'Admin') {
+  window.location.href = 'tenant-dashboard.html';
+  throw new Error('Unauthorised');
 }
 
 // ── DOM Elements ──────────────────────────────────────────────────────────────
@@ -231,7 +235,7 @@ tenantSelect.addEventListener('change', () => {
 
     // Prefill matching room in selection dropdown
     if (tenant.roomNumber) {
-      const room = roomsCache.find(r => String(r.roomNumber) === String(tenant.roomNumber));
+      const room = roomsCache.find(r => String(r.roomNumber).trim().toLowerCase() === String(tenant.roomNumber).trim().toLowerCase());
       if (room) {
         roomSelect.value = room._id;
       }

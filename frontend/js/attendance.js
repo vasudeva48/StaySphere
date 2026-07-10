@@ -13,6 +13,10 @@ if (!token || !user) {
   window.location.href = 'index.html';
   throw new Error('Unauthenticated');
 }
+if (user.role !== 'Admin') {
+  window.location.href = 'tenant-dashboard.html';
+  throw new Error('Unauthorised');
+}
 
 // ── DOM Elements ──────────────────────────────────────────────────────────────
 const adminNameEl         = document.getElementById('admin-name');
@@ -480,6 +484,11 @@ document.getElementById('attendance-modal-close').addEventListener('click', () =
 //  INIT PAGE LOADS
 // ═══════════════════════════════════════════════════════════════════════════════
 async function init() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryStatus = urlParams.get('status');
+  if (queryStatus) {
+    statusFilter.value = queryStatus;
+  }
   await loadDropdownData();
   await loadStatsSummary();
   await loadAttendanceLogs();

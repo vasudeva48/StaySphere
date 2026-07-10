@@ -8,6 +8,10 @@ if (!token || !user) {
   window.location.href = 'index.html';
   throw new Error('Unauthenticated – redirecting');
 }
+if (user.role !== 'Admin') {
+  window.location.href = 'tenant-dashboard.html';
+  throw new Error('Unauthorised – redirecting');
+}
 
 // ── DOM refs ──────────────────────────────────────────────────────────
 const adminNameEl    = document.getElementById('admin-name');
@@ -59,24 +63,24 @@ function showToast(msg, isError = false) {
 
 // ── Stat cards mapping ────────────────────────────────────────────────
 const statMap = [
-  { id: 'stat-tenants',     key: 'totalTenants',            label: 'Total Tenants',            icon: '👥', accent: '#6c63ff', iconBg: 'rgba(108,99,255,0.12)', rupees: false },
-  { id: 'stat-rooms',       key: 'totalRooms',              label: 'Total Rooms',              icon: '🏠', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
-  { id: 'stat-occupied',    key: 'occupiedRooms',           label: 'Occupied Rooms',           icon: '🔒', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
-  { id: 'stat-vacant',      key: 'vacantRooms',             label: 'Vacant Rooms',             icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
-  { id: 'stat-rent-pend',   key: 'pendingRentPayments',     label: 'Pending / Overdue Rent',   icon: '💳', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: false },
-  { id: 'stat-rent-coll',   key: 'monthlyRentCollected',    label: 'Rent Collected (Month)',    icon: '💰', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: true  },
-  { id: 'stat-agreements',  key: 'activeAgreements',        label: 'Active Agreements',        icon: '📜', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
-  { id: 'stat-maintenance-open', key: 'openMaintenanceRequests', label: 'Open Maintenance Requests',  icon: '🔧', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
-  { id: 'stat-maintenance-res',  key: 'resolvedMaintenanceRequests', label: 'Resolved Maintenance Requests',icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',  rupees: false },
-  { id: 'stat-visitors',         key: 'todaysVisitorCheckIns',  label: "Today's Visitors",          icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false },
-  { id: 'stat-visitors-in',      key: 'currentlyCheckedIn',     label: 'Currently Checked In',      icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
-  { id: 'stat-visitors-out',     key: 'checkedOutToday',        label: 'Checked Out Today',         icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false },
-  { id: 'stat-monthly-expenses', key: 'monthlyExpenses',        label: 'Current Month Expenses (₹)', icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true  },
-  { id: 'stat-total-expenses',   key: 'totalExpenses',          label: 'Total Expenses (₹)',        icon: '💸', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: true  },
-  { id: 'stat-attendance-in',  key: 'todaysCheckIns',          label: "Today's Check-ins",        icon: '📅', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false },
-  { id: 'stat-attendance-out', key: 'todaysCheckOuts',         label: "Today's Check-outs",       icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false },
-  { id: 'stat-attendance-pres',key: 'currentlyPresent',        label: "Currently Present Tenants",icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false },
-  { id: 'stat-active-notices', key: 'activeNoticesCount',       label: "Total Active Notices",     icon: '📢', accent: '#6c63ff', iconBg: 'rgba(108,99,255,0.12)', rupees: false },
+  { id: 'stat-tenants',     key: 'totalTenants',            label: 'Total Tenants',            icon: '👥', accent: '#6c63ff', iconBg: 'rgba(108,99,255,0.12)', rupees: false, link: 'tenants.html' },
+  { id: 'stat-rooms',       key: 'totalRooms',              label: 'Total Rooms',              icon: '🏠', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false, link: 'rooms.html' },
+  { id: 'stat-occupied',    key: 'occupiedRooms',           label: 'Occupied Rooms',           icon: '🔒', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false, link: 'rooms.html?status=Occupied' },
+  { id: 'stat-vacant',      key: 'vacantRooms',             label: 'Vacant Rooms',             icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false, link: 'rooms.html?status=Vacant' },
+  { id: 'stat-rent-pend',   key: 'pendingRentPayments',     label: 'Pending / Overdue Rent',   icon: '💳', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: false, link: 'rent.html' },
+  { id: 'stat-rent-coll',   key: 'monthlyRentCollected',    label: 'Rent Collected (Month)',    icon: '💰', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: true , link: 'rent.html' },
+  { id: 'stat-agreements',  key: 'activeAgreements',        label: 'Active Agreements',        icon: '📜', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false, link: 'agreements.html' },
+  { id: 'stat-maintenance-open', key: 'openMaintenanceRequests', label: 'Open Maintenance Requests',  icon: '🔧', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false, link: 'maintenance.html?status=Open' },
+  { id: 'stat-maintenance-res',  key: 'resolvedMaintenanceRequests', label: 'Resolved Maintenance Requests',icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',  rupees: false, link: 'maintenance.html?status=Resolved' },
+  { id: 'stat-visitors',         key: 'todaysVisitorCheckIns',  label: "Today's Visitors",          icon: '🚪', accent: '#00d4ff', iconBg: 'rgba(0,212,255,0.12)',   rupees: false, link: 'visitors.html' },
+  { id: 'stat-visitors-in',      key: 'currentlyCheckedIn',     label: 'Currently Checked In',      icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false, link: 'visitors.html' },
+  { id: 'stat-visitors-out',     key: 'checkedOutToday',        label: 'Checked Out Today',         icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false, link: 'visitors.html' },
+  { id: 'stat-monthly-expenses', key: 'monthlyExpenses',        label: 'Current Month Expenses (₹)', icon: '📊', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: true , link: 'expenses.html' },
+  { id: 'stat-total-expenses',   key: 'totalExpenses',          label: 'Total Expenses (₹)',        icon: '💸', accent: '#ef4444', iconBg: 'rgba(239,68,68,0.12)',   rupees: true , link: 'expenses.html' },
+  { id: 'stat-attendance-in',  key: 'todaysCheckIns',          label: "Today's Check-ins",        icon: '📅', accent: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  rupees: false, link: 'attendance.html?status=Checked In' },
+  { id: 'stat-attendance-out', key: 'todaysCheckOuts',         label: "Today's Check-outs",       icon: '🏃', accent: '#a855f7', iconBg: 'rgba(168,85,247,0.12)',  rupees: false, link: 'attendance.html?status=Checked Out' },
+  { id: 'stat-attendance-pres',key: 'currentlyPresent',        label: "Currently Present Tenants",icon: '✅', accent: '#22c55e', iconBg: 'rgba(34,197,94,0.12)',   rupees: false, link: 'attendance.html?status=Present' },
+  { id: 'stat-active-notices', key: 'activeNoticesCount',       label: "Total Active Notices",     icon: '📢', accent: '#6c63ff', iconBg: 'rgba(108,99,255,0.12)', rupees: false, link: 'notices.html' },
 ];
 
 
@@ -84,11 +88,11 @@ const statMap = [
 function renderSkeletonCards() {
   const grid = document.getElementById('stats-grid');
   grid.innerHTML = statMap.map(s => `
-    <div class="stat-card" style="--card-accent:${s.accent}; --card-icon-bg:${s.iconBg}">
+    <a href="${s.link}" class="stat-card" style="--card-accent:${s.accent}; --card-icon-bg:${s.iconBg}; text-decoration:none; display:flex;">
       <div class="stat-icon-wrap">${s.icon}</div>
       <div class="stat-label">${s.label}</div>
       <div class="stat-value loading">—</div>
-    </div>
+    </a>
   `).join('');
 }
 

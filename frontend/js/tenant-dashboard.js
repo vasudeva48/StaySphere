@@ -6,11 +6,28 @@
 ───────────────────────────────────────────────────────────────────────── */
 
 // Wait for tenant-auth.js to finish DOM setup, then run dashboard logic
+// Wait for tenant-auth.js to finish DOM setup, then run dashboard logic
 document.addEventListener('DOMContentLoaded', () => {
+  fetchTenantProfile();
   fetchMaintenance();
   fetchRentSummary();
   fetchAgreementSummary();
 });
+
+async function fetchTenantProfile() {
+  try {
+    const res  = await fetch(`${TENANT_API}/auth/me`, {
+      headers: { Authorization: `Bearer ${TENANT_TOKEN}` },
+    });
+    if (!res.ok) return;
+    const json = await res.json();
+    const t = json.data;
+    const roomEl = document.getElementById('card-room');
+    const bedEl  = document.getElementById('card-bed');
+    if (roomEl) roomEl.textContent = t.roomNumber ? `Room ${t.roomNumber}` : 'No Room';
+    if (bedEl)  bedEl.textContent  = t.bedNumber ? `Bed: ${t.bedNumber}` : 'Bed: —';
+  } catch (_) { /* silently fail */ }
+}
 
 async function fetchMaintenance() {
   try {
@@ -60,8 +77,6 @@ async function fetchAgreementSummary() {
 
     const agEl    = document.getElementById('card-agreement');
     const datesEl = document.getElementById('card-agreement-dates');
-    const roomEl  = document.getElementById('card-room');
-    const bedEl   = document.getElementById('card-bed');
 
     if (agEl) {
       agEl.textContent = active ? active.agreementStatus : '—';
@@ -73,10 +88,6 @@ async function fetchAgreementSummary() {
     if (datesEl && active) {
       const fmt = d => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
       datesEl.textContent = `${fmt(active.startDate)} – ${fmt(active.endDate)}`;
-    }
-    if (active?.room) {
-      if (roomEl) roomEl.textContent = `Room ${active.room.roomNumber}`;
-      if (bedEl)  bedEl.textContent  = `Type: ${active.room.roomType}`;
     }
   } catch (_) { /* silently fail */ }
 }
