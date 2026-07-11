@@ -8,7 +8,7 @@
    - Invalid/expired token → clear localStorage and show the login form
 ───────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://staysphere-backend-cdg7.onrender.com/api';
 
 // ── Helper: redirect to the correct dashboard based on role ──────────────────
 function redirectToDashboard(role) {

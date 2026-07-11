@@ -4,7 +4,7 @@
    dynamic dropdown pre-fills, and CRUD API calls.
 ─────────────────────────────────────────────────────────────────────────── */
 
-window.API_BASE = window.API_BASE || 'http://localhost:5000/api';
+window.API_BASE = window.API_BASE || 'https://staysphere-backend-cdg7.onrender.com/api';
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('ss_token');
