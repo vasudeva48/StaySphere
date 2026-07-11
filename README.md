@@ -168,6 +168,18 @@ Open the `frontend/index.html` file in your browser or serve it using a local we
 
 ---
 
+## ⭐ Project Highlights
+
+- Full-Stack Hostel & PG Management System
+- Role-Based Authentication (Admin & Tenant)
+- RESTful API using Express.js
+- MongoDB Atlas Cloud Database
+- JWT Authentication & Authorization
+- Responsive User Interface
+- Deployed using Netlify & Render
+
+---
+
 ## 👨‍💻 Author
 
 **Vasudeva**
