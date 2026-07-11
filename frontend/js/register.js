@@ -7,7 +7,7 @@
    - Invalid/expired token → clear localStorage and show the register form
 ───────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
+const API_BASE = 'http://localhost:5000/api';
 
 // ── Async token validation (runs before showing form) ────────────────────────
 (async () => {
@@ -35,29 +35,29 @@ const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
 })();
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
-const form = document.getElementById('register-form');
-const fullNameEl = document.getElementById('fullName');
-const phoneEl = document.getElementById('phoneNumber');
-const emailEl = document.getElementById('email');
-const roleEl = document.getElementById('role');
-const passwordEl = document.getElementById('password');
-const confirmPwEl = document.getElementById('confirmPassword');
-const submitBtn = document.getElementById('submit-btn');
-const btnText = document.getElementById('btn-text');
-const errorAlert = document.getElementById('error-alert');
-const errorMsg = document.getElementById('error-msg');
-const successAlert = document.getElementById('success-alert');
-const successMsg = document.getElementById('success-msg');
+const form           = document.getElementById('register-form');
+const fullNameEl     = document.getElementById('fullName');
+const phoneEl        = document.getElementById('phoneNumber');
+const emailEl        = document.getElementById('email');
+const roleEl         = document.getElementById('role');
+const passwordEl     = document.getElementById('password');
+const confirmPwEl    = document.getElementById('confirmPassword');
+const submitBtn      = document.getElementById('submit-btn');
+const btnText        = document.getElementById('btn-text');
+const errorAlert     = document.getElementById('error-alert');
+const errorMsg       = document.getElementById('error-msg');
+const successAlert   = document.getElementById('success-alert');
+const successMsg     = document.getElementById('success-msg');
 
 // ── Password toggles ──────────────────────────────────────────────────────
 function makeToggle(btnId, inputEl) {
   document.getElementById(btnId).addEventListener('click', () => {
-    const isText = inputEl.type === 'text';
-    inputEl.type = isText ? 'password' : 'text';
+    const isText    = inputEl.type === 'text';
+    inputEl.type    = isText ? 'password' : 'text';
     document.getElementById(btnId).textContent = isText ? '👁️' : '🙈';
   });
 }
-makeToggle('toggle-pw', passwordEl);
+makeToggle('toggle-pw',  passwordEl);
 makeToggle('toggle-cpw', confirmPwEl);
 
 // ── Alert helpers ─────────────────────────────────────────────────────────
@@ -126,7 +126,7 @@ function validate() {
 // ── Loading state ─────────────────────────────────────────────────────────
 function setLoading(loading) {
   submitBtn.disabled = loading;
-  btnText.innerHTML = loading
+  btnText.innerHTML  = loading
     ? '<span class="spinner"></span> Creating account…'
     : 'Create Account';
 }
@@ -139,14 +139,14 @@ form.addEventListener('submit', async (e) => {
   setLoading(true);
 
   try {
-    const res = await fetch(`${API_BASE}/auth/register`, {
-      method: 'POST',
+    const res  = await fetch(`${API_BASE}/auth/register`, {
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        fullName: fullNameEl.value.trim(),
-        email: emailEl.value.trim().toLowerCase(),
-        password: passwordEl.value,
-        role: roleEl.value,
+        fullName:    fullNameEl.value.trim(),
+        email:       emailEl.value.trim().toLowerCase(),
+        password:    passwordEl.value,
+        role:        roleEl.value,
         phoneNumber: phoneEl.value.trim(),
       }),
     });
@@ -173,8 +173,8 @@ form.addEventListener('submit', async (e) => {
 });
 
 // ── Clear field errors on input ───────────────────────────────────────────
-fullNameEl.addEventListener('input', () => setFieldError(fullNameEl, 'fullName-error', false));
-phoneEl.addEventListener('input', () => setFieldError(phoneEl, 'phoneNumber-error', false));
-emailEl.addEventListener('input', () => setFieldError(emailEl, 'email-error', false));
-passwordEl.addEventListener('input', () => setFieldError(passwordEl, 'password-error', false));
+fullNameEl.addEventListener('input',  () => setFieldError(fullNameEl,  'fullName-error',      false));
+phoneEl.addEventListener('input',     () => setFieldError(phoneEl,     'phoneNumber-error',   false));
+emailEl.addEventListener('input',     () => setFieldError(emailEl,     'email-error',         false));
+passwordEl.addEventListener('input',  () => setFieldError(passwordEl,  'password-error',      false));
 confirmPwEl.addEventListener('input', () => setFieldError(confirmPwEl, 'confirmPassword-error', false));

@@ -1,5 +1,5 @@
 // StaySphere – Homepage Entry Point
-const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
+const API_BASE = 'http://localhost:5000/api';
 
 // ── Homepage auth awareness ───────────────────────────────────────────────────
 // If a valid session exists, swap the nav Sign In / Register links for a
@@ -36,12 +36,12 @@ const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
 
     // Add dashboard + logout links
     const dashLink = document.createElement('a');
-    dashLink.href = dashboardUrl;
+    dashLink.href        = dashboardUrl;
     dashLink.textContent = '📊 Dashboard';
     dashLink.style.cssText = 'color:var(--clr-accent);font-weight:600;';
 
     const logoutLink = document.createElement('a');
-    logoutLink.href = '#';
+    logoutLink.href        = '#';
     logoutLink.textContent = 'Logout';
     logoutLink.style.cssText = 'color:var(--clr-muted);';
     logoutLink.addEventListener('click', (e) => {
@@ -58,7 +58,7 @@ const API_BASE = 'https://staysphere-backend-1lyo.onrender.com/api';
     const heroP = document.querySelector('.hero-content p');
     if (heroP) {
       const firstName = user.fullName?.split(' ')[0] || 'there';
-      const context = user?.role === 'Tenant'
+      const context   = user?.role === 'Tenant'
         ? 'Head to your portal to manage your stay.'
         : 'Head to your dashboard to manage your hostel.';
       heroP.textContent = `Welcome back, ${firstName}! ${context}`;
