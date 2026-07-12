@@ -1,94 +1,109 @@
 # 🏠 StaySphere – Hostel & PG Management System
 
-StaySphere is a full-stack Hostel & PG Management System designed to simplify hostel and PG administration. It provides separate Admin and Tenant portals to efficiently manage rooms, tenants, rent, agreements, maintenance requests, visitors, attendance, expenses, and notices from a single platform.
+StaySphere is a full-stack Hostel & PG Management System developed to simplify hostel and paying guest (PG) administration. It provides dedicated Admin and Tenant portals to efficiently manage rooms, tenants, rent, agreements, maintenance requests, visitors, attendance, expenses, and notices from a single platform.
 
 ---
 
-## 🌐 Live Demo
+# 🌐 Live Demo
 
-**Frontend:**  
+### Frontend
 https://staysphere-app.netlify.app/
 
-**Backend API:**  
+### Backend API
 https://staysphere-backend-cdg7.onrender.com
 
 ---
 
-## ✨ Features
+# 🎯 Project Overview
 
-### 👨‍💼 Admin Portal
+Managing a hostel manually can be time-consuming and error-prone. StaySphere digitizes hostel operations by providing a centralized platform where administrators can manage daily activities while tenants can access their personal information and services securely.
+
+---
+
+# ✨ Features
+
+## 👨‍💼 Admin Portal
 
 - Secure Admin Authentication
-- Dashboard with Statistics
+- Owner Dashboard
 - Room & Bed Management
 - Tenant Management
 - Rent Management
-- Digital Agreement Management
+- Digital Agreements
 - Maintenance Request Management
 - Visitor Management
 - Attendance Management
 - Expense Tracking
 - Notice Board Management
 - Search & Filter Support
-- Responsive Dashboard
+- Responsive User Interface
 
-### 👤 Tenant Portal
+---
+
+## 👤 Tenant Portal
 
 - Secure Tenant Authentication
 - Personal Dashboard
-- View Room & Bed Details
+- View Assigned Room & Bed
 - View Rent Records
 - View Digital Agreement
 - Submit Maintenance Requests
 - Track Maintenance Status
-- View Notices
+- View Active Notices
 - Profile Management
 
 ---
 
-## 🛠️ Tech Stack
+# 🛠️ Tech Stack
 
-### Frontend
+## Frontend
+
 - HTML5
 - CSS3
 - JavaScript (Vanilla)
 
-### Backend
+## Backend
+
 - Node.js
 - Express.js
 
-### Database
+## Database
+
 - MongoDB Atlas
 - Mongoose
 
-### Authentication
-- JSON Web Token (JWT)
-- Role-Based Access Control
+## Authentication
 
-### Deployment
-- Frontend: Netlify
-- Backend: Render
+- JSON Web Token (JWT)
+- Role-Based Authorization
+
+## Deployment
+
+- Netlify
+- Render
 
 ---
 
-## 📂 Project Structure
+# 📂 Project Structure
 
-```
-StaySphere/
+```text
+StaySphere
 │
-├── backend/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── config/
+├── backend
+│   ├── config
+│   ├── controllers
+│   ├── middleware
+│   ├── models
+│   ├── routes
+│   ├── utils
 │   ├── server.js
 │   └── package.json
 │
-├── frontend/
-│   ├── css/
-│   ├── js/
+├── frontend
+│   ├── css
+│   ├── js
 │   ├── index.html
+│   ├── about.html
 │   ├── login.html
 │   ├── register.html
 │   ├── dashboard.html
@@ -99,28 +114,28 @@ StaySphere/
 
 ---
 
-## 🚀 Installation
+# 🚀 Installation
 
-### Clone Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/vasudeva48/StaySphere.git
 ```
 
-### Navigate to Project
+## Navigate to Project
 
 ```bash
 cd StaySphere
 ```
 
-### Install Backend Dependencies
+## Install Dependencies
 
 ```bash
 cd backend
 npm install
 ```
 
-### Configure Environment Variables
+## Configure Environment Variables
 
 Create a `.env` file inside the backend folder.
 
@@ -130,66 +145,67 @@ MONGO_URI=YOUR_MONGODB_CONNECTION_STRING
 JWT_SECRET=YOUR_SECRET_KEY
 ```
 
-### Start Backend
+## Run Backend
 
 ```bash
 npm start
 ```
 
-### Open Frontend
+## Run Frontend
 
-Open the `frontend/index.html` file in your browser or serve it using a local web server.
+Open the frontend using **Live Server** or any local web server.
 
 ---
 
-## 📸 Modules
+# 📋 Modules
 
 - Authentication
 - Dashboard
-- Room Management
+- Room & Bed Management
 - Tenant Management
 - Rent Management
 - Digital Agreements
 - Maintenance Requests
 - Visitor Management
-- Attendance
+- Attendance & Check-In
 - Expense Tracking
 - Notice Board
 
 ---
 
-## 🔒 Security
+# 🔐 Security
 
 - JWT Authentication
 - Password Hashing
-- Protected Routes
+- Protected API Routes
 - Role-Based Authorization
-- Secure API Access
+- Secure User Sessions
 
 ---
 
-## ⭐ Project Highlights
+# ⭐ Project Highlights
 
 - Full-Stack Hostel & PG Management System
-- Role-Based Authentication (Admin & Tenant)
-- RESTful API using Express.js
+- Separate Admin & Tenant Portals
+- RESTful API Architecture
 - MongoDB Atlas Cloud Database
-- JWT Authentication & Authorization
+- JWT-Based Authentication
 - Responsive User Interface
-- Deployed using Netlify & Render
+- Cloud Deployment using Netlify & Render
 
 ---
 
-## 👨‍💻 Author
+# 👨‍💻 Author
 
 **Vasudeva**
 
-GitHub: https://github.com/vasudeva48
+GitHub:
+https://github.com/vasudeva48
 
 ---
 
-## 📄 License
+# 📄 License
 
-This project is developed for educational and portfolio purposes.
+This project was developed for educational, internship, and portfolio purposes.
 
 © 2026 StaySphere. All rights reserved.
