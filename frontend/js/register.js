@@ -7,7 +7,9 @@
    - Invalid/expired token → clear localStorage and show the register form
 ───────────────────────────────────────────────────────────────────────── */
 
-const API_BASE = 'https://staysphere-backend-cdg7.onrender.com/api';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000/api'
+  : 'https://staysphere-backend-cdg7.onrender.com/api';
 
 // ── Async token validation (runs before showing form) ────────────────────────
 (async () => {

@@ -26,6 +26,17 @@ const registerUser = async (req, res) => {
   }
 
   try {
+    // ── Check if Admin account already exists ──────────────────
+    if (role === 'Admin') {
+      const adminExists = await User.findOne({ role: 'Admin' });
+      if (adminExists) {
+        return res.status(400).json({
+          success: false,
+          message: 'An Admin account already exists.',
+        });
+      }
+    }
+
     // ── 2. Check for duplicate email ──────────────────────
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
