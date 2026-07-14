@@ -195,6 +195,16 @@ Open the frontend using **Live Server** or any local web server.
 
 ---
 
+## 📄 Project Documentation
+
+The complete project documentation is available in the `Documentation` folder.
+
+## 🔗 LinkedIn Article
+
+Read about my internship experience and the development of StaySphere here:
+
+https://www.linkedin.com/posts/vasudeva-g-61bbb032b_my-xebia-internship-journey-and-the-development-ugcPost-7482826048930443265-zIN1/?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAFNK8ncBfwt0brMIHbrKHaVSYaql26FAYHo
+
 # 👨‍💻 Author
 
 **Vasudeva**
