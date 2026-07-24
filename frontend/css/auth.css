@@ -298,3 +298,24 @@ html, body {
   .auth-card-body { padding-left: 1.25rem; padding-right: 1.25rem; }
   .form-grid-2 { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 380px) {
+  .auth-page {
+    padding: 1rem 0.5rem;
+  }
+  .auth-card {
+    border-radius: var(--radius-sm);
+  }
+  .auth-card-header,
+  .auth-card-body {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .auth-logo {
+    font-size: 1.4rem;
+  }
+  .auth-title {
+    font-size: 1.2rem;
+  }
+}
+

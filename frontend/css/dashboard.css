@@ -411,6 +411,42 @@ body {
   .main { margin-left: 0; }
   .hamburger { display: block; }
   .content { padding: 1.25rem; }
+  .topbar { padding: 1rem 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 0.85rem 0.85rem;
+  }
+  .topbar-name {
+    font-size: 1rem;
+  }
+  .role-badge {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.7rem;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  .content {
+    padding: 0.85rem;
+  }
+  .page-title {
+    font-size: 1.3rem;
+  }
+  .page-subtitle {
+    margin-bottom: 1.5rem;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    padding: 1.1rem 1.25rem;
+  }
 }
 
 /* ── Sidebar Overlay ────────────────────────────────────────────────── */
@@ -423,3 +459,4 @@ body {
 }
 
 .sidebar-overlay.show { display: block; }
+

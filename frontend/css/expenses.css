@@ -361,3 +361,54 @@ tbody td {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .search-wrap {
+    width: 100%;
+    min-width: 0;
+  }
+  .filter-select {
+    width: 100%;
+  }
+  .toolbar .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .stats-bar {
+    gap: 0.65rem;
+  }
+  .stat-chip {
+    flex: 1;
+    min-width: 140px;
+    justify-content: center;
+    padding: 0.5rem 0.85rem;
+  }
+  .modal-backdrop {
+    padding: 1rem 0.5rem;
+  }
+  .modal {
+    border-radius: var(--radius-sm);
+  }
+  .modal-header {
+    padding: 1rem 1.25rem;
+  }
+  .modal-body {
+    padding: 1.25rem 1rem;
+  }
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+  }
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+    margin: 0;
+  }
+}
+

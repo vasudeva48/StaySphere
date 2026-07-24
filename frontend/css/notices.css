@@ -151,3 +151,28 @@
   font-size: 0.75rem;
   color: var(--clr-muted);
 }
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .notices-stats {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .notices-stats {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  .notices-stat-card {
+    padding: 1rem 1.25rem;
+  }
+  .tenant-notices-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .tenant-notice-card {
+    padding: 1.15rem;
+  }
+}
+
